@@ -1,8 +1,8 @@
-# InkOS Studio v6.0
+# InkOS Studio v6.6
 
-> ✦ AI 写作工作台 · 模型余额管理 · 纯前端零依赖
+> ✦ AI 写作工作台 · 流式 SSE 实时生成 · Token 实时计数 · 零前端依赖
 
-[![Version](https://img.shields.io/badge/version-6.0-5c3a1e)](https://github.com/limingnanyue/novel-writing-workbench)
+[![Version](https://img.shields.io/badge/version-6.6-5c3a1e)](https://github.com/limingnanyue/novel-writing-workbench)
 [![PWA](https://img.shields.io/badge/PWA-ready-36c073)]()
 [![Zero Deps](https://img.shields.io/badge/frontend-zero_deps-36c073)]()
 
@@ -78,6 +78,8 @@ InkOS 纸质文学氛围，100% 还原 Narcooo/inkos 的 UI 设计语言。
 
 - 快捷操作栏：[⚡写下一章] [🔍审计] [📄导出] [📈市场雷达]
 - 消息样式：用户右滑入 `msgSlideRight`，AI 左滑入 `msgSlideLeft`
+- **SSE 流式生成** — AI 回复逐 token 实时渲染，无需等待
+- **Token 实时计数** — 生成过程中显示 `⚡N` 实时更新
 - 思考状态呼吸发光 `thinkGlow`
 - 输入：textarea + 发送按钮 + 模型选择器 + 书籍选择器
 
@@ -90,7 +92,7 @@ InkOS 纸质文学氛围，100% 还原 Narcooo/inkos 的 UI 设计语言。
 
 ---
 
-## 📡 API 端点（17 个）
+## 📡 API 端点（19 个）
 
 ### 模型余额（3 个）
 
@@ -98,6 +100,13 @@ InkOS 纸质文学氛围，100% 还原 Narcooo/inkos 的 UI 设计语言。
 GET    /api/models            # 模型列表（含用量）
 POST   /api/models            # 添加/更新模型
 DELETE /api/models/{id}        # 删除模型
+```
+
+### AI 聊天（2 个）
+
+```
+POST   /api/chat              # 一次性聊天
+POST   /api/chat/stream       # SSE 流式聊天（逐 token 推送，实时 ⚡N 计数）
 ```
 
 ### 写作工作台（14 个）
@@ -164,6 +173,7 @@ python3 server.py
 
 | 版本 | 说明 |
 |:--|:--|
+| **v6.6** | SSE 流式生成 + 实时 Token 计数 — `/api/chat/stream` 端点 |
 | **v6.0** | 纯 InkOS Studio 重制 — 删 LLM 网关，100% InkOS UI |
 | v5.3 | LLM 网关 + InkOS 写作 + OpenWrite 方法论融合 |
 | v5.2 | 网关 + AI 写作聊天 |
