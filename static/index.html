@@ -241,6 +241,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--t1);height:100%;ov
 .w-chap-view.show{display:flex}
 .w-chap-view .w-chap-close{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;border:1px solid var(--wbd);background:var(--ws2);color:var(--wt1);font-size:.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2}
 
+.w-ledger-item{padding:4px 8px;margin:2px 0;border-radius:4px;background:var(--ws1);border:1px solid var(--wbd);font-size:.38rem}
+.w-ledger-item .w-lg-label{font-weight:600;color:var(--wac);font-family:var(--fm);font-size:.36rem}
+.w-ledger-item .w-lg-val{color:var(--wt2);margin-top:2px;font-family:var(--fm)}
+
 /* ═══════════════════════════════════════
    DESKTOP — 768px+
    Sidebar + Main + Detail Panel
@@ -416,6 +420,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--t1);height:100%;ov
               <button class="w-btn" style="margin-top:2px;width:100%;justify-content:center;font-size:.38rem" onclick="quickWrite('characters')">➕ 添加角色</button>
             </div>
             <div class="w-sec">
+              <div class="w-toggle" id="wToggleLedger" onclick="toggleWCollapse('ledger')"><span class="w-tg-arr">▶</span> 📊 记忆台账</div>
+              <div class="w-collapse" id="wCollapseLedger"><div class="w-collapse-inner" id="wLedgerContent"><div style="font-size:.38rem;color:var(--wt3);padding:4px">暂无台账</div></div></div>
+              <button class="w-btn" style="margin-top:2px;width:100%;justify-content:center;font-size:.38rem" onclick="editLedger()">✏️ 编辑台账</button>
+            </div>
+            <div class="w-sec">
               <div class="w-stitle">📊 统计</div>
               <div class="w-stats" id="wStats">
                 <div class="w-stat">总字数 <b id="wTotalWC">0</b></div>
@@ -431,7 +440,13 @@ body{font-family:var(--font);background:var(--bg);color:var(--t1);height:100%;ov
               <button class="w-act" onclick="quickWrite('outline')">📋 大纲</button>
               <button class="w-act" onclick="quickWrite('characters')">👤 角色</button>
               <button class="w-act" onclick="quickWrite('anti_ai')">🔬 去AI味</button>
-              <button class="w-act" onclick="quickWrite('save')">💾 保存</button>
+              <button class="w-act" onclick="quickWrite('continue')">📝 续写</button>
+<button class="w-act" onclick="quickWrite('golden3')">🏆 黄金三章</button>
+<button class="w-act" onclick="quickWrite('outline')">📋 大纲</button>
+<button class="w-act" onclick="quickWrite('characters')">👤 角色</button>
+<button class="w-act" onclick="quickWrite('anti_ai')">🔬 去AI味</button>
+<button class="w-act" onclick="quickWrite('quality')">✅ 质检</button>
+<button class="w-act" onclick="quickWrite('save')">💾 保存</button>
             </div>
             <div class="chat-body" id="chatBody" style="flex:1;overflow-y:auto;padding:4px 0;display:flex;flex-direction:column;gap:3px">
               <div class="w-chat-empty" id="chatEmpty"><div class="w-ce-ic">✍️</div><div class="w-ce-t">AI 写作工作台</div><div class="w-ce-s">开一本新书，或选择已有书籍开始创作。左侧书架管理章节、大纲和角色。</div></div>
@@ -665,14 +680,14 @@ async function addProv(){
 async function resetTok(){if(!confirm('确定？'))return;await api('/api/tokens/reset',{method:'POST'});loadSettings();toast('已重置','good')}
 
 // ═══ Writing / Chat ═══
-const WS={books:[],activeBookId:'',chapters:{},characters:{},outline:{},writeMsgs:[]};
-(function wsLoad(){try{let d=localStorage.getItem('ws_data');if(d){let p=JSON.parse(d);WS.books=p.books||[];WS.activeBookId=p.activeBookId||'';WS.chapters=p.chapters||{};WS.characters=p.characters||{};WS.outline=p.outline||{};}}catch(e){}})();
-function wsSave(){try{localStorage.setItem('ws_data',JSON.stringify({books:WS.books,activeBookId:WS.activeBookId,chapters:WS.chapters,characters:WS.characters,outline:WS.outline}))}catch(e){}}
+const WS={books:[],activeBookId:'',chapters:{},characters:{},outline:{},ledger:{},writeMsgs:[]};
+(function wsLoad(){try{let d=localStorage.getItem('ws_data');if(d){let p=JSON.parse(d);WS.books=p.books||[];WS.activeBookId=p.activeBookId||'';WS.chapters=p.chapters||{};WS.characters=p.characters||{};WS.outline=p.outline||{};WS.ledger=p.ledger||{};}}catch(e){}})();
+function wsSave(){try{localStorage.setItem('ws_data',JSON.stringify({books:WS.books,activeBookId:WS.activeBookId,chapters:WS.chapters,characters:WS.characters,outline:WS.outline,ledger:WS.ledger}))}catch(e){}}
 
 function loadWrite(){
   if(!S.provs.length)api('/api/providers').then(p=>{S.provs=p.providers||[];renderChatProvs();});
   else renderChatProvs();
-  renderBookSel();renderWStats();
+  renderBookSel();renderLedger();renderWStats();
 }
 function renderChatProvs(){
   let sel=T('chatProv');if(!sel)return;
@@ -686,7 +701,7 @@ function renderBookSel(){
   sel.innerHTML='<option value="">— 选择 —</option>'+WS.books.map(b=>`<option value="${b.id}" ${WS.activeBookId===b.id?'selected':''}>${E(b.title)}</option>`).join('');
   sel.value=WS.activeBookId||'';
   let lbl=T('wBookLabel');if(lbl){let b=WS.books.find(x=>x.id===WS.activeBookId);lbl.textContent=b?b.title:'书架';}
-  renderChapters();renderOutline();renderChars();renderWStats();
+  renderChapters();renderOutline();renderChars();renderLedger();renderWStats();
 }
 
 function createBook(){
@@ -772,14 +787,43 @@ function delChar(idx){
   chars.splice(idx,1);wsSave();renderChars();renderWStats();toast('角色已删除','good');
 }
 
+function renderLedger(){
+  let cont=T('wLedgerContent'),slide=T('wPanelSlide');
+  if(!cont)return;
+  let lg=WS.ledger[WS.activeBookId]||{};
+  if(!lg.endings){cont.innerHTML='<div style="font-size:.38rem;color:var(--wt3);padding:4px">暂无台账</div>';}
+  else{
+    let endings=lg.endings||[], chars=lg.charStates||{}, foreshadowing=lg.foreshadowing||[];
+    cont.innerHTML='<div class="w-ledger-item"><span class="w-lg-label">结尾类型:</span><span class="w-lg-val">'+(endings.slice(-5).join(', ')||'无')+'</span></div>'+
+      '<div class="w-ledger-item"><span class="w-lg-label">角色状态:</span><span class="w-lg-val">'+(Object.entries(chars).map(([k,v])=>k+':'+v).join('; ')||'无')+'</span></div>'+
+      '<div class="w-ledger-item"><span class="w-lg-label">伏笔:</span><span class="w-lg-val">'+(foreshadowing.length?foreshadowing.map(f=>f.name).join(', '):'无')+'</span></div>';
+  }
+  if(slide)slide.innerHTML=T('wLeft').innerHTML;
+}
+function editLedger(){
+  if(!WS.activeBookId){toast('请先选择书籍','bad');return;}
+  let lg=WS.ledger[WS.activeBookId]||{endings:[],charStates:{},foreshadowing:[]};
+  let endings=prompt('已用结尾类型（逗号分隔）:',(lg.endings||[]).join(','));
+  if(endings===null)return;
+  let charStates=prompt('角色状态（格式: 角色=状态, 角色=状态）:',Object.entries(lg.charStates||{}).map(([k,v])=>k+'='+v).join(','));
+  if(charStates===null)return;
+  let fs=prompt('伏笔列表（逗号分隔，每项为 伏笔名@计划回收章）:',(lg.foreshadowing||[]).map(f=>f.name+'@'+(f.recover||'')).join(','));
+  if(fs===null)return;
+  lg.endings=endings.split(',').map(s=>s.trim()).filter(Boolean);
+  lg.charStates={};charStates.split(',').forEach(p=>{let [k,v]=p.split('=').map(s=>s.trim());if(k&&v)lg.charStates[k]=v;});
+  lg.foreshadowing=fs.split(',').map(s=>{let [n,r]=s.trim().split('@');return {name:n||'',recover:r||''};}).filter(f=>f.name);
+  WS.ledger[WS.activeBookId]=lg;wsSave();renderLedger();toast('台账已更新','good');
+}
+
 function toggleWPanel(){
   let ov=T('wPanelOverlay'),sl=T('wPanelSlide');
   if(sl.innerHTML)sl.innerHTML=T('wLeft').innerHTML;
   ov.classList.toggle('show');sl.classList.toggle('show');
 }
 function toggleWCollapse(panel){
-  let tg=T('wToggle'+(panel==='outline'?'Outline':'Chars'));
-  let cl=T('wCollapse'+(panel==='outline'?'Outline':'Chars'));
+  let suffix={'outline':'Outline','chars':'Chars','ledger':'Ledger'}[panel]||panel.charAt(0).toUpperCase()+panel.slice(1);
+  let tg=T('wToggle'+suffix);
+  let cl=T('wCollapse'+suffix);
   if(tg)tg.classList.toggle('w-open');
   if(cl)cl.classList.toggle('w-open');
 }
@@ -787,14 +831,19 @@ function toggleWCollapse(panel){
 function quickWrite(type){
   if(!WS.activeBookId){toast('请先选择或创建一本书','bad');return;}
   let book=WS.books.find(b=>b.id===WS.activeBookId);if(!book)return;
-  let chs=WS.chapters[WS.activeBookId]||[],chars=WS.characters[WS.activeBookId]||[];
+  let bid=WS.activeBookId,chs=WS.chapters[bid]||[],chars=WS.characters[bid]||[],lg=WS.ledger[bid]||{};
+  let endings=(lg.endings||[]).slice(-5).join(',')||'无';
+  let charStates=Object.entries(lg.charStates||{}).map(([k,v])=>k+':'+v).join('; ')||'无';
+  let foreshadowing=(lg.foreshadowing||[]).map(f=>f.name+'(@'+(f.recover||'?')+')').join(',')||'无';
   let prompts={
-    continue:`继续写作《${book.title}》。已完成${chs.length}章。请自然地延续上一章的结尾，保持一致的文风和节奏。字数2000-3000字。`,
-    outline:`为《${book.title}》规划大纲。${chs.length?'当前已有'+chs.length+'章。':''}请按卷结构规划：每卷包含若干章，每章附一句话摘要。`,
-    characters:`为《${book.title}》设计角色列表。请列出主要角色，包括名字和简短描述。${chars.length?'当前已有角色：'+chars.map(c=>c.name).join('、'):''}`,
-    anti_ai:`请检查以下内容中的AI味并改写，使其更自然、更有人味。去除机械感、重复句式、过度使用连接词。如果改写后需要继续添加内容，请自然衔接。`,
-    new_chapter:`为《${book.title}》写第${chs.length+1}章。${chars.length?'涉及角色：'+chars.map(c=>c.name).join('、')+'. ':''}字数2000-3000字，注意情节推进和角色塑造。`,
-    save:`请总结当前写作进度：已完成${chs.length}章，合计${chs.reduce((s,c)=>s+(c.wordCount||0),0)}字。根据已有内容，建议接下来3章的写作方向。`
+    continue:`📝 续写《${book.title}》——6步写作工作流。\n\n【状态读取】已完成${chs.length}章，已用结尾类型: ${endings}，角色状态: ${charStates}，待回收伏笔: ${foreshadowing}。\n\n【写作标准】\n- 字数2000-2500字，低于2000必须扩写\n- 开头200字内进入冲突/笑点/悬念\n- 对话占比≥50%，全用短句口语化\n- 章首禁用时间词（第二天/次日/翌日等），用"已完成的事"暗示时间流动\n- 章尾最后3句=强力钩子\n- 第一段从身体感受开始，不从认知开始\n- 句号占比≤30%，连续句号不超过3个\n- 段落长短交替（长100-200+中50-100+短10-50+极短1-10）\n- 环境描写覆盖≥3种感官\n- 一个场景内只允许一个视角\n\n【反水文】无"想了想""叹了口气""愣了一下"等废话；无同一信息说两遍；无否定式排比\n\n【连续性】章尾不闭环收尾；章首直接承接上章结尾（场景/动作/对话）；连续2章不用同一结尾类型。`,
+    golden3:`🏆 为《${book.title}》写黄金三章开头。\n\n【第一章】穿越/重生+系统激活+第一个打脸+结尾爽点预告\n- 300字内穿越交代→500字内系统激活→800字内第一次打脸\n- 字数2500-3000字\n\n【第二章】系统奖励+第二个打脸+众人震惊+结尾反转钩子\n- 承接第一章奖励→换场景换对手→让周围人震惊\n\n【第三章】展现实力+第三个打脸+全场轰动+结尾更大危机\n- 全面展示能力→第三个打脸全场轰动→所有人顶礼膜拜→结尾留更大危机\n\n目标：每章完读率≥85%，三章后留存≥70%。爽点密度高，节奏紧凑。`,
+    outline:`📋 为《${book.title}》规划完整大纲。\n\n${chs.length?'当前已有'+chs.length+'章。':''}请输出:\n- 卷级大纲：每卷核心冲突+情绪弧线+人物弧光+伏笔计划\n- 章级细纲：每章情节点+钩子类型(章首/章尾)+爽点密度\n- 世界观展开节奏\n- 角色出场计划\n\n按"大纲→卷纲→细纲"三层结构组织。`,
+    characters:`👤 为《${book.title}》设计角色体系。\n\n${chars.length?'当前角色：'+chars.map(c=>c.name).join('、')+'\n':''}请按五维骨架设计每个角色：\n- 外观特征+口头禅+惯用动作\n- 内在驱动+恐惧+秘密\n- 与其他角色的关系网\n- 跨卷成长弧线\n- 语言风格标签\n\n区分核心层(详细)和生态层(简略)。`,
+    anti_ai:`🔬 对以下内容执行去AI味处理——6大门禁+三刀流+8类必查。\n\n【六大门禁】\nGate A·禁用词替换：仿佛/好像/犹如/一丝/一抹/深吸一口气/缓缓/不禁/微微/眼中闪过/嘴角勾起/心中一动/不由得/突然/瞬间/自然而然→具体动作/细节描写\nGate B·句式去套路："XX说道"→动作替代(60%+无标签)；"……，带着……"万能状语→独立短句\nGate C·心理描写外化："他很紧张"→"他的手在抖"\nGate D·节奏打碎：打断连续排比句，长句拆短句，偶尔用不完整句\nGate E·对话去腔调：加"嗯""哦""靠""嘶"，角色可以答非所问，删解释性对话\nGate F·结尾去升华：删总结性语句，用动作/场景收尾\n\n【三刀流】第一刀斩逻辑链(删因为/所以/为了)；第二刀砍形容词(用生理反应替换)；第三刀拆长句(每段≤3行，每句≤15字)\n\n【8类必查】解释腔/作者报账/镜头脚本语言/先果后因/主语断裂/空泛情绪/模板化AI句式("不是X而是Y")/段尾金句病\n\n请先输出AI味检测报告(轻度/中度/重度+禁用词密度)，再输出改写结果。`,
+    quality:`✅ 对《${book.title}》最新章节执行三层质检。\n\n【第一层·字词级】错别字/漏字/多字/同音错字/形近错字\n【第二层·句段级】句式重复/词汇复现/"说三缺一"/指代断裂/时序跳跃/场景突变/章节衔接检查\n【第三层·篇章级】人名地名一致性/设定一致性/伏笔登记/章末钩子/节奏疲软点/连续性验证：章首是否有时间词？章尾钩子是否丢失？承接是否连贯？\n\n${charStates?'当前角色状态：'+charStates+'\n':''}${endings?'已用结尾类型：'+endings+'\n':''}${foreshadowing?'待回收伏笔：'+foreshadowing+'\n':''}\n\n请输出质检报告：问题分级(S1-S4)，每项标注位置和建议修改方案。`,
+    new_chapter:`为《${book.title}》写第${chs.length+1}章。\n\n${chars.length?'角色：'+chars.map(c=>c.name).join('、')+'\n':''}${endings?'上章结尾类型：'+endings.split(',').pop()+'（避免重复）\n':''}${charStates?'角色状态：'+charStates+'\n':''}\n\n【写作标准】字数2000-2500字，开头200字进入冲突，对话≥50%，全短句口语化，无比喻排比拟人。章首禁用时间词，章尾强钩子。第一段从身体感受开始。`,
+    save:`💾 总结《${book.title}》写作进度。\n已完成${chs.length}章，合计${chs.reduce((s,c)=>s+(c.wordCount||0),0)}字。\n${charStates?'当前角色状态：'+charStates+'\n':''}${foreshadowing?'待回收伏笔：'+foreshadowing+'\n':''}\n请输出：\n1. 剧情进度总结（2-3句）\n2. 下一个5章规划方向\n3. 需要调整的写作策略建议`
   };
   let text=prompts[type]||type;
   T('chatInput').value=text;sendWriteChat();
