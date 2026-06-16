@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-LLM Gateway Dashboard v5.2
-手机端模型+写作面板 · 多提供商 · 连接测试 · 余额查询 · 模型列表 · AI对话
+LLM Gateway Dashboard v5.3
+手机端模型+写作面板 · 多提供商 · 连接测试 · 余额查询 · 模型列表 · 写作工作台
 """
-import sys, os, json, re, datetime, uuid, subprocess, urllib.request
+import sys, os, json, re, datetime, uuid, shutil, subprocess, urllib.request
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
@@ -204,7 +204,7 @@ def health():
     total_models = sum(len(p.get("cached_models", [])) for p in provs.get("providers", []))
     return {
         "ready": True,
-        "version": "5.1.0",
+        "version": "5.3.0",
         "host": HOST,
         "port": PORT,
         "providers_count": len(provs.get("providers", [])),
@@ -348,6 +348,202 @@ def chat(req: ChatInput):
         return {"role": "assistant", "content": f"[Error: {str(e)[:100]}]", "tokens": 0, "error": str(e)[:200]}
 
 # ═══════════════════════════════════════
+# Writing / Book Management
+# ═══════════════════════════════════════
+
+WRITING_DIR = DATA_DIR / "writing"
+WRITING_DIR.mkdir(parents=True, exist_ok=True)
+
+def _get_book_dir(book_id):
+    return WRITING_DIR / book_id
+
+def _load_book_json(book_id, filename, default=None):
+    path = _get_book_dir(book_id) / filename
+    return _load_json(path, default)
+
+def _save_book_json(book_id, filename, data):
+    d = _get_book_dir(book_id)
+    d.mkdir(parents=True, exist_ok=True)
+    _save_json(d / filename, data)
+
+# List all books
+@app.get("/api/writing/books")
+def list_books():
+    books = []
+    if WRITING_DIR.exists():
+        for d in sorted(WRITING_DIR.iterdir(), key=lambda x: x.name, reverse=True):
+            if d.is_dir():
+                b = _load_json(d / "book.json", {})
+                stats = _load_json(d / "stats.json", {})
+                b["stats"] = stats
+                books.append(b)
+    return {"books": books}
+
+# Create book
+class BookInput(BaseModel):
+    title: str
+    genre: str = ""
+    author: str = ""
+
+@app.post("/api/writing/books")
+def create_book(req: BookInput):
+    bid = uuid.uuid4().hex[:10]
+    now = datetime.datetime.now().isoformat()
+    book = {"id": bid, "title": req.title, "genre": req.genre, "author": req.author, "created_at": now, "updated_at": now}
+    _save_book_json(bid, "book.json", book)
+    _save_book_json(bid, "stats.json", {"total_words": 0, "chapter_count": 0, "character_count": 0})
+    _save_book_json(bid, "outline.json", {"volumes": []})
+    _save_book_json(bid, "characters.json", [])
+    # create chapters dir
+    (_get_book_dir(bid) / "chapters").mkdir(parents=True, exist_ok=True)
+    return {"book": book, "created": True}
+
+# Get book
+@app.get("/api/writing/books/{book_id}")
+def get_book(book_id: str):
+    b = _load_book_json(book_id, "book.json")
+    if not b: raise HTTPException(404, "Book not found")
+    b["stats"] = _load_book_json(book_id, "stats.json", {})
+    b["chapters"] = list_chapters_internal(book_id)
+    b["characters"] = _load_book_json(book_id, "characters.json", [])
+    b["outline"] = _load_book_json(book_id, "outline.json", {"volumes": []})
+    return b
+
+# Delete book
+@app.delete("/api/writing/books/{book_id}")
+def delete_book(book_id: str):
+    d = _get_book_dir(book_id)
+    if d.exists(): shutil.rmtree(d)
+    return {"deleted": True}
+
+def list_chapters_internal(book_id):
+    cd = _get_book_dir(book_id) / "chapters"
+    if not cd.exists(): return []
+    chaps = []
+    for f in sorted(cd.iterdir(), key=lambda x: x.name):
+        if f.suffix == '.json':
+            chaps.append(_load_json(f, {}))
+    return chaps
+
+# List chapters
+@app.get("/api/writing/books/{book_id}/chapters")
+def list_chapters(book_id: str):
+    return {"chapters": list_chapters_internal(book_id)}
+
+# Save chapter
+class ChapterInput(BaseModel):
+    title: str = ""
+    content: str = ""
+    chapter_number: int = 0
+    status: str = "draft"
+
+@app.post("/api/writing/books/{book_id}/chapters")
+def save_chapter(book_id: str, req: ChapterInput):
+    cd = _get_book_dir(book_id) / "chapters"
+    cd.mkdir(parents=True, exist_ok=True)
+    cid = uuid.uuid4().hex[:8]
+    ch_num = req.chapter_number or len(list(cd.iterdir())) + 1
+    word_count = len(req.content.replace(' ', '').replace('\n', '')) if req.content else 0
+    now = datetime.datetime.now().isoformat()
+    chap = {
+        "id": cid, "title": req.title or f"第{ch_num}章",
+        "content": req.content, "word_count": word_count,
+        "chapter_number": ch_num, "status": req.status,
+        "created_at": now, "updated_at": now
+    }
+    _save_json(cd / f"{cid}.json", chap)
+    # update stats
+    stats = _load_book_json(book_id, "stats.json", {})
+    chaps = list_chapters_internal(book_id)
+    stats["total_words"] = sum(c.get("word_count", 0) for c in chaps)
+    stats["chapter_count"] = len(chaps)
+    _save_book_json(book_id, "stats.json", stats)
+    # update book updated_at
+    b = _load_book_json(book_id, "book.json", {})
+    b["updated_at"] = now
+    _save_book_json(book_id, "book.json", b)
+    return {"chapter": chap}
+
+# Get chapter
+@app.get("/api/writing/books/{book_id}/chapters/{chapter_id}")
+def get_chapter(book_id: str, chapter_id: str):
+    path = _get_book_dir(book_id) / "chapters" / f"{chapter_id}.json"
+    if not path.exists(): raise HTTPException(404, "Chapter not found")
+    return _load_json(path, {})
+
+# Delete chapter
+@app.delete("/api/writing/books/{book_id}/chapters/{chapter_id}")
+def delete_chapter(book_id: str, chapter_id: str):
+    path = _get_book_dir(book_id) / "chapters" / f"{chapter_id}.json"
+    if path.exists(): path.unlink()
+    # update stats
+    stats = _load_book_json(book_id, "stats.json", {})
+    chaps = list_chapters_internal(book_id)
+    stats["total_words"] = sum(c.get("word_count", 0) for c in chaps)
+    stats["chapter_count"] = len(chaps)
+    _save_book_json(book_id, "stats.json", stats)
+    return {"deleted": True}
+
+# Save characters
+class CharactersInput(BaseModel):
+    characters: list = []
+
+@app.post("/api/writing/books/{book_id}/characters")
+def save_characters(book_id: str, req: CharactersInput):
+    _save_book_json(book_id, "characters.json", req.characters)
+    stats = _load_book_json(book_id, "stats.json", {})
+    stats["character_count"] = len(req.characters)
+    _save_book_json(book_id, "stats.json", stats)
+    return {"saved": True, "count": len(req.characters)}
+
+# Save outline
+class OutlineInput(BaseModel):
+    volumes: list = []
+
+@app.post("/api/writing/books/{book_id}/outline")
+def save_outline(book_id: str, req: OutlineInput):
+    _save_book_json(book_id, "outline.json", {"volumes": req.volumes})
+    return {"saved": True, "volumes": len(req.volumes)}
+
+# Enhanced writing chat
+class WriteChatInput(BaseModel):
+    messages: list = []
+    provider_id: str = ""
+    book_id: str = ""
+    system_prompt: str = ""
+
+@app.post("/api/writing/chat")
+def write_chat(req: WriteChatInput):
+    provs = get_providers()
+    provider = None
+    if req.provider_id:
+        for p in provs.get("providers", []):
+            if p.get("id") == req.provider_id:
+                provider = p
+                break
+    if not provider:
+        provider = provs.get("providers", [{}])[0] if provs.get("providers") else None
+    if not provider:
+        raise HTTPException(400, "No provider configured")
+    
+    messages = []
+    if req.system_prompt:
+        messages.append({"role": "system", "content": req.system_prompt})
+    messages.extend(req.messages or [])
+    if not messages:
+        messages = [{"role": "user", "content": "Hello"}]
+    
+    try:
+        content = call_llm(provider, messages, max_tokens=2048)
+        tokens = estimate_tokens(content)
+        add_token_usage(tokens, provider.get("name", ""), "write")
+        return {"role": "assistant", "content": content, "tokens": tokens, "provider": provider.get("name")}
+    except HTTPException as he:
+        return {"role": "assistant", "content": f"[API Error: {he.detail}]", "tokens": 0, "error": str(he.detail)[:200]}
+    except Exception as e:
+        return {"role": "assistant", "content": f"[Error: {str(e)[:100]}]", "tokens": 0, "error": str(e)[:200]}
+
+# ═══════════════════════════════════════
 # Frontend
 # ═══════════════════════════════════════
 
@@ -358,7 +554,7 @@ def index():
 
 if __name__ == "__main__":
     import uvicorn
-    print(f"\n  LLM Gateway Dashboard v5.2")
+    print(f"\n  LLM Gateway Dashboard v5.3")
     print(f"  http://{HOST}:{PORT}")
     print(f"  Data: {DATA_DIR}\n")
     uvicorn.run(app, host=HOST, port=PORT, log_level="warning")

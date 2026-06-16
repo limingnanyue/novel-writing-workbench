@@ -1,42 +1,33 @@
 ---
 name: novel-writing-workbench
 description: >
-  小说写作工作台 v4.5 —— 移动优先Web应用。5Tab导航(工作台/对话/写作/书籍/设置) + 手势滑动 +
-  6风格封面生成(现代/古典/暗黑/极简/海报/插画) + InkOS AI封面提示词 + 市场扫榜(起点/番茄/飞卢/晋江) +
-  对话式AI写作(ChatPage消息气泡+快捷操作) + 开书推倒(5维评分+平台推荐) +
-  文风分析(句长/AI标记) + AI写作代理(8题材+规则注入+Token追踪) +
-  自定义AI提供商 + 多Agent路由 + PWA + 底部弹出层(替代模态框)。
-  taste-skill v2重设计(DIALS 5/3/5·Anti-Default·Restrained Motion·Brief Inference)。
-  对标项目：InkOS/oh-story-claudecode/chinese-novelist-skill/feinetcui。
+  LLM Gateway Dashboard v5.2 —— 移动优先+桌面响应式，零依赖模型管理面板。
+  4Tab导航(仪表盘/模型/写作/设置) + 连接测试 + 余额查询(3级回退) + 模型列表缓存 +
+  AI写作对话(5个快速指令+提供商切换+最后10条历史上下文) + Token统计 +
+  桌面端三栏布局(侧栏220px+中栏340px+详情面板) + PWA(ServiceWorker+manifest)。
+  taste-skill v2设计(DIALS 5/3/5·暗色奢华+电动蓝+终端美学)。
+  对标：one-api/lobe-chat/InkOS。
 triggers:
+  - LLM管理
+  - 模型管理
+  - API管理
+  - 网关面板
+  - 启动面板
   - 工作台
-  - web写作
-  - 启动工作台
-  - 写作工具
-  - 封面生成
-  - 设计封面
-  - 生成封面
-  - 扫榜
-  - 市场扫榜
-  - 市场雷达
-  - Token统计
-  - 自定义AI
-  - 写作分析
-  - 书籍管理
-  - 开书推倒
-  - 推倒
-  - 评估开篇
   - AI写作
-  - 手机写作
+  - 写作对话
+  - 测试连接
+  - 余额查询
+  - Token统计
+  - 提供商管理
   - PWA
-  - 底部弹出层
-version: 4.5
+version: 5.2
 last_updated: 2026-06-16
 ---
 
-# LLM Gateway Dashboard v5.0 🔌
+# LLM Gateway Dashboard v5.2 🔌
 
-> **移动优先 · 3Tab导航 · 连接测试 · 余额查询 · 模型列表**
+> **移动优先 + 桌面响应式 · 4Tab导航 · AI写作对话 · 连接测试 · 余额查询**
 
 ## 快速启动
 
@@ -51,25 +42,26 @@ python3 server.py &
 
 ## 核心功能
 
-| 功能 | v5.0 |
+| Tab | 功能 |
+|:----|:-----|
+| ⌘ **仪表盘** | 统计卡片(提供商数/模型数/请求数) + 提供商列表 + 详情面板 |
+| 🔌 **模型** | 添加/编辑/删除提供商 + 测试连接(调用/v1/models) + 余额查询(3级回退) + 模型标签预览 |
+| ✍️ **写作** | AI对话 + 5个快速指令(写第1章/分析文风/起名/大纲/去AI味) + 提供商切换下拉 + 最后10条历史上下文 |
+| ⚙️ **设置** | 提供商管理 + Token统计(按提供商请求数/消耗) + 重置 + 关于 |
+
+| 特性 | 说明 |
 |:-----|:-----|
-| 🔌 **多提供商管理** | 添加/编辑/删除 OpenAI 兼容 API 提供商 |
-| 🔍 **连接测试** | 调用 `/v1/models` 获取模型列表，过滤非文本模型 |
-| 💰 **余额查询** | 3级回退策略：Billing API → Usage API → Test Call |
-| 📋 **模型列表** | 测试后缓存模型列表，展示模型ID和归属 |
-| 📊 **Token追踪** | 按提供商统计请求数/Token消耗/测试次数 |
-| 📱 **移动端** | 3Tab底部导航 + 底部弹出层 + 手势滑动 |
+| 📱 **移动端** | 4Tab底部导航 + 底部弹出层 + 手势滑动 |
+| 🖥️ **桌面端** | ≥768px三栏布局(侧栏220px+中栏340px+详情面板)，≥1200px侧栏加宽至260px |
+| 💰 **余额查询** | 3级回退：Billing API → Usage API → Test Call |
 | 📦 **PWA** | Service Worker(cache-first) + manifest + 192/512图标 |
+| 🎨 **设计** | 暗色奢华(#0a0a0f) + 电动蓝(#5b8af7) + JetBrains Mono终端美学 |
 
-## v5.0 重构（鲁班打磨）
+## 版本演进
 
-**从写作工作台 → LLM模型管理面板**
-
-- **验料**：定位调整为"手机上的LLM API管理面板"
-- **访行**：对标 one-api(35K星)/lobe-chat/LLM-API-Key-Proxy
-- **慢刨**：去除全部写作功能（chat/editor/books/evaluate），精简 server.py 从1336行→290行
-- **新增**：连接测试 + 余额查询(3级回退) + 模型列表缓存
-- **回炉**：3Tab UI重设计（仪表盘/模型/设置）
+**v5.0** 从写作工作台重构为LLM Gateway：去除全部写作功能，精简至3Tab
+**v5.1** 添加桌面端响应式三栏布局
+**v5.2** 写作Tab回归——AI对话写得比人好，砍了可惜
 
 ### 余额查询三级回退
 
@@ -96,7 +88,7 @@ python3 server.py &
 | `/api/providers/{id}/test` | POST | 测试连接 + 获取模型列表 + 缓存 |
 | `/api/providers/{id}/models` | GET | 缓存模型列表 |
 | `/api/providers/{id}/balance` | POST | 余额查询（3级回退） |
-| `/api/chat` | POST | 测试对话 |
+| `/api/chat` | POST | AI写作对话（provider+model+message+history） |
 | `/api/tokens` | GET | Token统计 |
 | `/api/tokens/reset` | POST | 重置统计 |
 
@@ -104,13 +96,13 @@ python3 server.py &
 
 ```
 novel-writing-workbench/
-  server.py          290行 — FastAPI所有端点
+  server.py          ~370行 — FastAPI所有端点（含Chat）
   static/
-    index.html       21KB — 完整SPA(CSS+JS内联)
+    index.html       ~22KB — 完整SPA(CSS+JS内联，4Tab+桌面三栏)
     sw.js            PWA Service Worker
     manifest.json    PWA配置
-    assets/          PWA icons
-  data/              提供商/Token数据
+    assets/          PWA icons (192+512)
+  data/              提供商/Token数据(providers.json+tokens.json)
   references/        设计模式参考
 ```
 
@@ -118,5 +110,8 @@ novel-writing-workbench/
 
 - **端口占用**：重启前 `fuser -k 8080/tcp`
 - **api_key安全**：`GET /api/providers` 不返回 key，仅返回 `has_key: true/false`
-- **HTML热更新**：修改 index.html 无需重启
+- **HTML热更新**：修改 index.html 无需重启服务器
 - **余额查询不支持所有提供商**：三级回退全部失败返回 `source: "none"`
+- **版本号散落6处**：更新版本时需修改 index.html(title/hero/sidebar/about) + server.py(docstring/print) —— 漏一处就有残留旧版本号
+- **Git无历史**：此仓库经历多次`git init`重置，推送时可能需要`--force`
+- **GitHub直连被墙**：推送用GitHub API + token，不走git协议

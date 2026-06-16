@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <meta name="theme-color" content="#0a0a0f">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>LLM Gateway v5.2</title>
+<title>LLM Gateway v5.3</title>
 <link rel="manifest" href="/static/manifest.json">
 <style>
 /* ═══════ taste-skill v2 DIALS: 5/3/5 ═══════ */
@@ -165,6 +165,82 @@ body{font-family:var(--font);background:var(--bg);color:var(--t1);height:100%;ov
   .chat-inp textarea{font-size:.52rem}.chip-w{font-size:.42rem}
 }
 
+/* ═══ Writing Tab: InkOS Paper Theme ═══ */
+.writing-scope{--wbg:#faf6f0;--ws1:#f0ebe0;--ws2:#e8e0d0;--wbd:#d4c8b0;--wac:#8b4513;--wa2:#a0522d;--wt1:#2c1810;--wt2:#6b5b4f;--wt3:#a09080;--wfont:'Georgia','Songti SC','STSong','Noto Serif SC',serif;--wr:6px}
+.writing-scope{background:var(--wbg);position:relative}
+.writing-scope::before{content:'';position:absolute;inset:0;opacity:.03;pointer-events:none;z-index:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")}
+.w-layout{display:flex;flex:1;min-height:0;position:relative;z-index:1}
+.w-left{display:none;width:280px;border-right:1px solid var(--wbd);background:var(--ws1);overflow-y:auto;flex-shrink:0;padding:10px 0;flex-direction:column;gap:4px}
+.w-left .w-sec{padding:0 12px}
+.w-left .w-stitle{font-size:.45rem;font-weight:600;color:var(--wt2);font-family:var(--fm);text-transform:uppercase;letter-spacing:.05em;margin:8px 0 4px}
+.w-book-sel{display:flex;gap:4px;align-items:center}
+.w-book-sel select{flex:1;padding:5px 8px;border:1px solid var(--wbd);border-radius:var(--wr);background:var(--wbg);color:var(--wt1);font-size:.45rem;font-family:var(--fm);outline:none}
+.w-book-sel select:focus{border-color:var(--wac)}
+.w-btn{display:inline-flex;align-items:center;gap:3px;padding:4px 8px;border-radius:var(--wr);border:1px solid var(--wbd);background:var(--ws2);color:var(--wt2);font-size:.4rem;cursor:pointer;font-family:var(--fm);transition:all .12s ease;white-space:nowrap}
+.w-btn:active{background:var(--wbd)}
+.w-btn.w-pri{background:var(--wac);color:#fff;border-color:var(--wa2)}
+.w-chlist{display:flex;flex-direction:column;gap:1px;max-height:220px;overflow-y:auto}
+.w-chap{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:var(--wr);cursor:pointer;font-size:.42rem;font-family:var(--fm);color:var(--wt2);transition:all .1s ease;border:1px solid transparent}
+.w-chap:hover{background:var(--ws2)}
+.w-chap.w-active{background:var(--ws2);border-color:var(--wac);color:var(--wt1)}
+.w-chap .w-ch-num{font-weight:600;color:var(--wac);flex-shrink:0;min-width:22px}
+.w-chap .w-ch-title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.w-chap .w-ch-wc{font-size:.36rem;color:var(--wt3)}
+.w-stats{display:flex;gap:8px;padding:4px 0}
+.w-stats .w-stat{font-size:.38rem;color:var(--wt3);font-family:var(--fm)}
+.w-stats .w-stat b{color:var(--wac);font-size:.48rem}
+.w-toggle{display:flex;align-items:center;gap:6px;padding:6px 12px;cursor:pointer;font-size:.42rem;color:var(--wt2);font-family:var(--fm);border:none;background:transparent;width:100%;text-align:left;border-radius:var(--wr);transition:all .1s ease}
+.w-toggle:hover{background:var(--ws2)}
+.w-toggle .w-tg-arr{transition:transform .15s ease;font-size:.36rem}
+.w-toggle.w-open .w-tg-arr{transform:rotate(90deg)}
+.w-collapse{display:grid;grid-template-rows:0fr;transition:grid-template-rows .2s ease;overflow:hidden}
+.w-collapse.w-open{grid-template-rows:1fr}
+.w-collapse-inner{min-height:0;overflow:hidden;padding:0 12px}
+.w-collapse.w-open .w-collapse-inner{overflow-y:auto;padding:4px 12px}
+.w-ol-item{padding:4px 8px;margin:2px 0;border-radius:4px;background:var(--ws1);border:1px solid var(--wbd);font-size:.4rem}
+.w-ol-item .w-ol-title{font-weight:600;color:var(--wt1);cursor:pointer;font-family:var(--wfont)}
+.w-ol-item .w-ol-summary{color:var(--wt3);font-size:.38rem;margin-top:2px;font-family:var(--wfont)}
+.w-char-item{display:flex;align-items:center;gap:6px;padding:4px 8px;margin:2px 0;border-radius:4px;background:var(--ws1);border:1px solid var(--wbd);cursor:pointer;font-size:.4rem}
+.w-char-item:hover{border-color:var(--wac)}
+.w-char-item .w-ch-name{font-weight:600;color:var(--wac);font-family:var(--wfont)}
+.w-char-item .w-ch-desc{color:var(--wt3);font-size:.36rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+#wMobileBar{display:flex;padding:6px 12px;border-bottom:1px solid var(--wbd);flex-shrink:0}
+.w-panel-overlay{display:none;position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.5)}
+.w-panel-slide{position:fixed;top:0;left:0;bottom:0;width:280px;z-index:91;background:var(--ws1);border-right:1px solid var(--wbd);transform:translateX(-100%);transition:transform .2s ease;overflow-y:auto;display:flex;flex-direction:column;gap:4px;padding:10px 0}
+.w-panel-slide.show{transform:translateX(0)}
+.w-panel-overlay.show{display:block}
+.w-main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;padding:8px 12px}
+.w-actions{display:flex;gap:4px;padding:4px 0 8px;flex-shrink:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.w-actions::-webkit-scrollbar{height:0}
+.w-act{flex-shrink:0;padding:5px 10px;border-radius:var(--wr);border:1px solid var(--wbd);background:var(--ws1);color:var(--wt2);font-size:.4rem;cursor:pointer;font-family:var(--fm);white-space:nowrap;transition:all .12s ease;display:flex;align-items:center;gap:3px}
+.w-act:hover{border-color:var(--wac);color:var(--wac);background:var(--ws2)}
+.w-act:active{transform:scale(.97)}
+.w-msg{display:flex;gap:6px;max-width:85%;animation:msg-in .15s ease;margin-bottom:6px}
+.w-msg.w-usr{align-self:flex-end;flex-direction:row-reverse}
+.w-msg.w-assist{align-self:flex-start}
+.w-msg .w-m-av{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.5rem}
+.w-msg.w-usr .w-m-av{background:var(--wac);color:#fff}
+.w-msg.w-assist .w-m-av{background:var(--ws2);color:var(--wac);border:1px solid var(--wbd)}
+.w-msg .w-m-bub{padding:8px 12px;border-radius:10px;font-size:.48rem;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.w-msg.w-usr .w-m-bub{background:var(--wt1);color:var(--wbg);border-bottom-right-radius:3px}
+.w-msg.w-assist .w-m-bub{background:var(--ws2);color:var(--wt1);border-bottom-left-radius:3px;font-family:var(--wfont);border:1px solid var(--wbd)}
+.w-msg .w-m-time{font-size:.35rem;color:var(--wt3);margin-top:3px;font-family:var(--fm)}
+.w-main .chat-foot{border-top:1px solid var(--wbd);padding:6px 0 0}
+.w-main .chat-inp textarea{background:var(--ws1);border-color:var(--wbd);color:var(--wt1)}
+.w-main .chat-inp textarea:focus{border-color:var(--wac)}
+.w-main .chat-inp .snd{background:var(--wac);border-color:var(--wa2)}
+.w-main .chat-inp .snd:disabled{background:var(--ws2);color:var(--wt3)}
+.w-main select.inp{background:var(--ws1);border-color:var(--wbd);color:var(--wt2)}
+.w-chat-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--wt3)}
+.w-chat-empty .w-ce-ic{font-size:2.5rem;opacity:.12}
+.w-chat-empty .w-ce-t{font-size:.6rem;color:var(--wt2);font-weight:600;font-family:var(--wfont)}
+.w-chat-empty .w-ce-s{font-size:.42rem;max-width:240px;text-align:center;line-height:1.5}
+.w-edit-area{width:100%;min-height:100px;padding:8px;border:1px solid var(--wbd);border-radius:var(--wr);background:var(--wbg);color:var(--wt1);font-family:var(--wfont);font-size:.45rem;resize:vertical;outline:none}
+.w-edit-area:focus{border-color:var(--wac)}
+.w-chap-view{display:none;position:fixed;inset:0;z-index:95;background:var(--ws1);flex-direction:column;overflow-y:auto;padding:16px}
+.w-chap-view.show{display:flex}
+.w-chap-view .w-chap-close{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;border:1px solid var(--wbd);background:var(--ws2);color:var(--wt1);font-size:.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2}
+
 /* ═══════════════════════════════════════
    DESKTOP — 768px+
    Sidebar + Main + Detail Panel
@@ -215,8 +291,16 @@ body{font-family:var(--font);background:var(--bg);color:var(--t1);height:100%;ov
   .pcard .pn{font-size:.55rem}.pcard .pu{font-size:.42rem}
   .mitem{font-size:.48rem}.mitem .mby{font-size:.4rem}
   .result{font-size:.48rem;max-height:300px}
+  /* Writing tab — desktop layout */
+  #wMobileBar{display:none!important}
+  .w-left{display:flex!important;width:260px}
+  .w-layout{flex-direction:row}
+  .w-chap{font-size:.44rem}
+  .w-msg .w-m-bub{font-size:.5rem}
+  .w-chap-view{max-width:600px;margin:40px auto;border-radius:12px;border:1px solid var(--wbd);max-height:calc(100vh - 80px);position:fixed;inset:0;z-index:95}
+  .w-panel-overlay.show{display:none!important}
+  .w-panel-slide.show{transform:translateX(-100%)}
 }
-
 /* ═══════════════════════════════════════
    WIDE DESKTOP — 1200px+
    ═══════════════════════════════════════ */
@@ -225,6 +309,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--t1);height:100%;ov
   .desk-list{width:380px}
   .stat3{grid-template-columns:repeat(3,1fr)}.stat .sv{font-size:1.3rem}
   .hero h1{font-size:1rem}
+  #pg-write .w-left{width:300px}
 }
 </style>
 </head>
@@ -232,7 +317,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--t1);height:100%;ov
 
 <!-- ═══ DESKTOP SIDEBAR ═══ -->
 <div class="sidebar" id="sidebar">
-  <div class="sb-brand"><div class="sbn">LLM Gateway</div><div class="sbv">v5.2 · 模型+写作面板</div></div>
+  <div class="sb-brand"><div class="sbn">LLM Gateway</div><div class="sbv">v5.3 · InkOS写作工作台</div></div>
   <div class="sb-stats"><span id="sbTk">···</span> <span class="dot on ss-dot" id="sbDot"></span></div>
   <div class="sbtabs">
     <button class="sbtab active" onclick="switchTab(0)"><span class="si">⌘</span> 仪表盘</button>
@@ -258,7 +343,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--t1);height:100%;ov
     <div class="page active" id="pg-dash">
       <div class="desk-layout">
         <div class="desk-list" id="dashList">
-          <div class="hero" style="margin-bottom:8px"><h1>LLM Gateway</h1><div class="sub">v5.2 · 手机端+桌面双模式</div></div>
+          <div class="hero" style="margin-bottom:8px"><h1>LLM Gateway</h1><div class="sub">v5.3 · InkOS写作工作台</div></div>
           <div class="stat3" id="statsRow"><div class="skel" style="height:50px"></div><div class="skel" style="height:50px"></div><div class="skel" style="height:50px"></div></div>
           <div class="sec"><span class="st">提供商</span><span class="sa" id="provCount">0</span></div>
           <div id="dashProvs"><div class="skel" style="height:44px"></div></div>
@@ -284,24 +369,82 @@ body{font-family:var(--font);background:var(--bg);color:var(--t1);height:100%;ov
 
     <!-- Writing -->
     <div class="page" id="pg-write">
-      <div class="pi" style="display:flex;flex-direction:column;flex:1;padding-top:6px;padding-bottom:6px">
-        <div class="chips-row" id="chipsRow">
-          <span class="chip-w" onclick="quickChat('写第1章，3000字，开篇直接冲突')">✍️ 写第1章</span>
-          <span class="chip-w" onclick="quickChat('分析我的写作风格优缺点')">🔍 分析文风</span>
-          <span class="chip-w" onclick="quickChat('给我主角起3个名字并说明理由')">👤 起名</span>
-          <span class="chip-w" onclick="quickChat('规划接下来5章的大纲')">📋 大纲</span>
-          <span class="chip-w" onclick="quickChat('检查下面内容的AI味并改写')">🔬 去AI味</span>
+      <div class="writing-scope" style="display:flex;flex-direction:column;flex:1;min-height:0">
+        <!-- Mobile header bar -->
+        <div id="wMobileBar">
+          <button class="w-btn" onclick="toggleWPanel()" style="display:flex;align-items:center;gap:4px">📚 <span id="wBookLabel" style="font-size:.38rem;color:var(--wt3);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">书架</span></button>
+          <div style="flex:1"></div>
+          <button class="w-btn" onclick="quickWrite('continue')" style="font-size:.4rem">📝 续写</button>
         </div>
-        <div class="chat-body" id="chatBody">
-          <div class="chat-empty-w" id="chatEmpty"><div class="ce-ic">✍️</div><div class="ce-t">AI 写作对话</div><div class="ce-s">选择提供商，告诉 AI 你想写什么</div></div>
-        </div>
-        <div class="chat-foot">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
-            <select class="inp" id="chatProv" style="margin-bottom:0;font-size:.42rem;padding:4px 8px;flex:1"></select>
+        <!-- Mobile slide-out panel -->
+        <div class="w-panel-overlay" id="wPanelOverlay" onclick="toggleWPanel()"></div>
+        <div class="w-panel-slide" id="wPanelSlide"></div>
+        <!-- Chapter view overlay -->
+        <div class="w-chap-view" id="wChapView">
+          <button class="w-chap-close" onclick="closeChapView()">✕</button>
+          <div style="font-size:.5rem;font-weight:600;color:var(--wt1);margin-bottom:8px;font-family:var(--wfont)" id="wChapViewTitle"></div>
+          <textarea class="w-edit-area" id="wChapEdit" style="flex:1;min-height:200px" placeholder="章节内容..."></textarea>
+          <div style="display:flex;gap:6px;margin-top:8px">
+            <button class="w-btn w-pri" onclick="saveChapEdit()" style="flex:1">💾 保存章节</button>
+            <button class="w-btn" onclick="closeChapView()">取消</button>
           </div>
-          <div class="chat-inp">
-            <textarea id="chatInput" rows="1" placeholder="告诉 AI 你想写什么..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"></textarea>
-            <button class="snd" id="sendBtn" onclick="sendChat()">↑</button>
+        </div>
+        <!-- Main layout -->
+        <div class="w-layout" style="flex:1;min-height:0;overflow:hidden">
+          <!-- Left Panel (desktop inline) -->
+          <div class="w-left" id="wLeft">
+            <div class="w-sec">
+              <div class="w-stitle">📖 当前书籍</div>
+              <div class="w-book-sel">
+                <select id="wBookSel" onchange="selectBook(this.value)"><option value="">— 选择 —</option></select>
+                <button class="w-btn w-pri" onclick="createBook()" title="开新书">＋</button>
+              </div>
+            </div>
+            <div class="w-sec">
+              <div class="w-stitle">📑 章节</div>
+              <div class="w-chlist" id="wChList"><div style="font-size:.38rem;color:var(--wt3);padding:8px;text-align:center">暂无章节</div></div>
+              <button class="w-btn" style="margin-top:6px;width:100%;justify-content:center" onclick="quickWrite('new_chapter')">＋ 写新章节</button>
+            </div>
+            <div class="w-sec">
+              <div class="w-toggle" id="wToggleOutline" onclick="toggleWCollapse('outline')"><span class="w-tg-arr">▶</span> 📋 大纲</div>
+              <div class="w-collapse" id="wCollapseOutline"><div class="w-collapse-inner" id="wOutlineContent"><div style="font-size:.38rem;color:var(--wt3);padding:4px">暂无大纲</div></div></div>
+              <button class="w-btn" style="margin-top:2px;width:100%;justify-content:center;font-size:.38rem" onclick="quickWrite('outline')">🔍 AI 生成大纲</button>
+            </div>
+            <div class="w-sec">
+              <div class="w-toggle" id="wToggleChars" onclick="toggleWCollapse('chars')"><span class="w-tg-arr">▶</span> 👤 角色</div>
+              <div class="w-collapse" id="wCollapseChars"><div class="w-collapse-inner" id="wCharsContent"><div style="font-size:.38rem;color:var(--wt3);padding:4px">暂无角色</div></div></div>
+              <button class="w-btn" style="margin-top:2px;width:100%;justify-content:center;font-size:.38rem" onclick="quickWrite('characters')">➕ 添加角色</button>
+            </div>
+            <div class="w-sec">
+              <div class="w-stitle">📊 统计</div>
+              <div class="w-stats" id="wStats">
+                <div class="w-stat">总字数 <b id="wTotalWC">0</b></div>
+                <div class="w-stat">章节 <b id="wChapCount">0</b></div>
+                <div class="w-stat">角色 <b id="wCharCount">0</b></div>
+              </div>
+            </div>
+          </div>
+          <!-- Main chat area -->
+          <div class="w-main">
+            <div class="w-actions" id="wActions">
+              <button class="w-act" onclick="quickWrite('continue')">📝 续写</button>
+              <button class="w-act" onclick="quickWrite('outline')">📋 大纲</button>
+              <button class="w-act" onclick="quickWrite('characters')">👤 角色</button>
+              <button class="w-act" onclick="quickWrite('anti_ai')">🔬 去AI味</button>
+              <button class="w-act" onclick="quickWrite('save')">💾 保存</button>
+            </div>
+            <div class="chat-body" id="chatBody" style="flex:1;overflow-y:auto;padding:4px 0;display:flex;flex-direction:column;gap:3px">
+              <div class="w-chat-empty" id="chatEmpty"><div class="w-ce-ic">✍️</div><div class="w-ce-t">AI 写作工作台</div><div class="w-ce-s">开一本新书，或选择已有书籍开始创作。左侧书架管理章节、大纲和角色。</div></div>
+            </div>
+            <div class="chat-foot">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">
+                <select class="inp" id="chatProv" style="margin-bottom:0;font-size:.42rem;padding:4px 8px;flex:1"></select>
+              </div>
+              <div class="chat-inp">
+                <textarea id="chatInput" rows="1" placeholder="告诉 AI 你想写什么..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendWriteChat()}"></textarea>
+                <button class="snd" id="sendBtn" onclick="sendWriteChat()">↑</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -317,7 +460,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--t1);height:100%;ov
         <button class="btn dan sm" style="margin-top:6px" onclick="resetTok()">重置统计</button>
         <div class="sec"><span class="st">关于</span></div>
         <div style="font-size:.42rem;color:var(--t3);font-family:var(--fm);line-height:1.6">
-          LLM Gateway Dashboard v5.2<br>FastAPI + 纯前端 · 零依赖<br>移动端+桌面双模式 · 鲁班打磨
+          LLM Gateway Dashboard v5.3<br>FastAPI + 纯前端 · 零依赖<br>InkOS写作工作台 · 鲁班打磨
         </div>
       </div>
     </div>
@@ -522,34 +665,161 @@ async function addProv(){
 async function resetTok(){if(!confirm('确定？'))return;await api('/api/tokens/reset',{method:'POST'});loadSettings();toast('已重置','good')}
 
 // ═══ Writing / Chat ═══
+const WS={books:[],activeBookId:'',chapters:{},characters:{},outline:{},writeMsgs:[]};
+(function wsLoad(){try{let d=localStorage.getItem('ws_data');if(d){let p=JSON.parse(d);WS.books=p.books||[];WS.activeBookId=p.activeBookId||'';WS.chapters=p.chapters||{};WS.characters=p.characters||{};WS.outline=p.outline||{};}}catch(e){}})();
+function wsSave(){try{localStorage.setItem('ws_data',JSON.stringify({books:WS.books,activeBookId:WS.activeBookId,chapters:WS.chapters,characters:WS.characters,outline:WS.outline}))}catch(e){}}
+
 function loadWrite(){
-  if(!S.provs.length)api('/api/providers').then(p=>{S.provs=p.providers||[];renderChatProvs()});
+  if(!S.provs.length)api('/api/providers').then(p=>{S.provs=p.providers||[];renderChatProvs();});
   else renderChatProvs();
+  renderBookSel();renderWStats();
 }
 function renderChatProvs(){
-  let sel=T('chatProv');sel.innerHTML=(S.provs.length?S.provs.map(p=>`<option value="${p.id}" ${S.chatPid===p.id?'selected':''}>${E(p.name)} · ${E(p.model||'')}</option>`).join(''):'<option>暂无提供商</option>');
+  let sel=T('chatProv');if(!sel)return;
+  sel.innerHTML=(S.provs.length?S.provs.map(p=>`<option value="${p.id}" ${S.chatPid===p.id?'selected':''}>${E(p.name)} · ${E(p.model||'')}</option>`).join(''):'<option>暂无提供商</option>');
   sel.onchange=()=>S.chatPid=sel.value;
   if(!S.chatPid&&S.provs.length){S.chatPid=S.provs[0].id;sel.value=S.chatPid}
 }
-function quickChat(text){T('chatInput').value=text;sendChat()}
-async function sendChat(){
+
+function renderBookSel(){
+  let sel=T('wBookSel');if(!sel)return;
+  sel.innerHTML='<option value="">— 选择 —</option>'+WS.books.map(b=>`<option value="${b.id}" ${WS.activeBookId===b.id?'selected':''}>${E(b.title)}</option>`).join('');
+  sel.value=WS.activeBookId||'';
+  let lbl=T('wBookLabel');if(lbl){let b=WS.books.find(x=>x.id===WS.activeBookId);lbl.textContent=b?b.title:'书架';}
+  renderChapters();renderOutline();renderChars();renderWStats();
+}
+
+function createBook(){
+  let title=prompt('📖 新书标题：');
+  if(!title||!title.trim())return;
+  let id='b_'+Date.now();WS.books.push({id,title:title.trim(),created:Date.now()});
+  WS.activeBookId=id;wsSave();renderBookSel();toast('📖 新书《'+title.trim()+'》已创建','good');
+}
+function selectBook(id){WS.activeBookId=id;wsSave();renderBookSel();}
+
+function renderChapters(){
+  let list=T('wChList'),slide=T('wPanelSlide');
+  if(!list)return;
+  let bid=WS.activeBookId,chs=WS.chapters[bid]||[];
+  let html=chs.length?chs.map((c,i)=>`<div class="w-chap" onclick="viewChapter(${i})">
+    <span class="w-ch-num">第${i+1}章</span>
+    <span class="w-ch-title">${E(c.title||'未命名')}</span>
+    <span class="w-ch-wc">${c.wordCount||0}字</span>
+  </div>`).join(''):'<div style="font-size:.38rem;color:var(--wt3);padding:8px;text-align:center">暂无章节</div>';
+  list.innerHTML=html;
+  if(slide)slide.innerHTML=T('wLeft').innerHTML;
+}
+
+function viewChapter(idx){
+  let bid=WS.activeBookId,chs=WS.chapters[bid]||[],c=chs[idx];
+  if(!c)return;
+  T('wChapViewTitle').textContent='第'+(idx+1)+'章 · '+c.title;
+  T('wChapEdit').value=c.content||'';
+  T('wChapEdit').dataset.chapIdx=idx;
+  T('wChapView').classList.add('show');
+}
+function closeChapView(){T('wChapView').classList.remove('show');}
+function saveChapEdit(){
+  let bid=WS.activeBookId,chs=WS.chapters[bid]||[],idx=parseInt(T('wChapEdit').dataset.chapIdx);
+  if(isNaN(idx)||!chs[idx])return;
+  chs[idx].content=T('wChapEdit').value;
+  chs[idx].wordCount=(chs[idx].content||'').replace(/\s/g,'').length;
+  wsSave();renderChapters();renderWStats();closeChapView();toast('💾 章节已保存','good');
+}
+
+function renderOutline(){
+  let cont=T('wOutlineContent'),slide=T('wPanelSlide');
+  if(!cont)return;
+  let ol=WS.outline[WS.activeBookId];
+  if(!ol||!ol.length){cont.innerHTML='<div style="font-size:.38rem;color:var(--wt3);padding:4px">暂无大纲</div>';}
+  else{cont.innerHTML=ol.map(v=>`<div class="w-ol-item">
+    <div class="w-ol-title">${E(v.volume||'')}</div>
+    ${(v.chapters||[]).map(ch=>`<div class="w-ol-summary">${E(ch.title||'')}: ${E(ch.summary||'')}</div>`).join('')}
+  </div>`).join('');}
+  if(slide)slide.innerHTML=T('wLeft').innerHTML;
+}
+
+function renderChars(){
+  let cont=T('wCharsContent'),slide=T('wPanelSlide');
+  if(!cont)return;
+  let chars=WS.characters[WS.activeBookId]||[];
+  if(!chars.length){cont.innerHTML='<div style="font-size:.38rem;color:var(--wt3);padding:4px">暂无角色</div>';}
+  else{cont.innerHTML=chars.map((c,i)=>`<div class="w-char-item" onclick="editChar(${i})">
+    <span class="w-ch-name">${E(c.name)}</span>
+    <span class="w-ch-desc">${E((c.desc||'').slice(0,40))}</span>
+    <button class="w-btn" style="margin-left:auto;font-size:.35rem;padding:2px 6px" onclick="event.stopPropagation();delChar(${i})">✕</button>
+  </div>`).join('');}
+  if(slide)slide.innerHTML=T('wLeft').innerHTML;
+}
+
+function renderWStats(){
+  let tw=T('wTotalWC'),tc=T('wChapCount'),tcr=T('wCharCount');
+  if(!tw)return;
+  let bid=WS.activeBookId,chs=WS.chapters[bid]||[],chars=WS.characters[bid]||[];
+  let wc=chs.reduce((s,c)=>s+(c.wordCount||0),0);
+  if(tw)tw.textContent=wc;if(tc)tc.textContent=chs.length;if(tcr)tcr.textContent=chars.length;
+}
+
+function editChar(idx){
+  let chars=WS.characters[WS.activeBookId]||[],c=chars[idx];if(!c)return;
+  let name=prompt('角色名：',c.name);if(name===null)return;
+  let desc=prompt('描述：',c.desc||'');if(desc===null)return;
+  c.name=name.trim()||c.name;c.desc=desc.trim();wsSave();renderChars();renderWStats();toast('角色已更新','good');
+}
+function delChar(idx){
+  let chars=WS.characters[WS.activeBookId]||[];if(!chars[idx])return;
+  if(!confirm('删除角色「'+chars[idx].name+'」？'))return;
+  chars.splice(idx,1);wsSave();renderChars();renderWStats();toast('角色已删除','good');
+}
+
+function toggleWPanel(){
+  let ov=T('wPanelOverlay'),sl=T('wPanelSlide');
+  if(sl.innerHTML)sl.innerHTML=T('wLeft').innerHTML;
+  ov.classList.toggle('show');sl.classList.toggle('show');
+}
+function toggleWCollapse(panel){
+  let tg=T('wToggle'+(panel==='outline'?'Outline':'Chars'));
+  let cl=T('wCollapse'+(panel==='outline'?'Outline':'Chars'));
+  if(tg)tg.classList.toggle('w-open');
+  if(cl)cl.classList.toggle('w-open');
+}
+
+function quickWrite(type){
+  if(!WS.activeBookId){toast('请先选择或创建一本书','bad');return;}
+  let book=WS.books.find(b=>b.id===WS.activeBookId);if(!book)return;
+  let chs=WS.chapters[WS.activeBookId]||[],chars=WS.characters[WS.activeBookId]||[];
+  let prompts={
+    continue:`继续写作《${book.title}》。已完成${chs.length}章。请自然地延续上一章的结尾，保持一致的文风和节奏。字数2000-3000字。`,
+    outline:`为《${book.title}》规划大纲。${chs.length?'当前已有'+chs.length+'章。':''}请按卷结构规划：每卷包含若干章，每章附一句话摘要。`,
+    characters:`为《${book.title}》设计角色列表。请列出主要角色，包括名字和简短描述。${chars.length?'当前已有角色：'+chars.map(c=>c.name).join('、'):''}`,
+    anti_ai:`请检查以下内容中的AI味并改写，使其更自然、更有人味。去除机械感、重复句式、过度使用连接词。如果改写后需要继续添加内容，请自然衔接。`,
+    new_chapter:`为《${book.title}》写第${chs.length+1}章。${chars.length?'涉及角色：'+chars.map(c=>c.name).join('、')+'. ':''}字数2000-3000字，注意情节推进和角色塑造。`,
+    save:`请总结当前写作进度：已完成${chs.length}章，合计${chs.reduce((s,c)=>s+(c.wordCount||0),0)}字。根据已有内容，建议接下来3章的写作方向。`
+  };
+  let text=prompts[type]||type;
+  T('chatInput').value=text;sendWriteChat();
+}
+
+async function sendWriteChat(){
   let inp=T('chatInput'),text=inp.value.trim();if(!text||!S.chatPid)return;
   inp.value='';inp.style.height='auto';
   let body=T('chatBody'),empty=T('chatEmpty');if(empty)empty.style.display='none';
-  // Add user msg
-  let um=div('msg user',`<div class="m-av">👤</div><div><div class="m-bub">${E(text)}</div><div class="m-time">${now()}</div></div>`);
-  body.appendChild(um);S.chatMsgs.push({role:'user',content:text});
-  // Typing
-  let ty=div('msg assistant','<div class="m-av">AI</div><div class="typing-dots"><span></span><span></span><span></span></div>');
+  let um=div('w-msg w-usr',`<div class="w-m-av">👤</div><div><div class="w-m-bub">${E(text)}</div><div class="w-m-time">${now()}</div></div>`);
+  body.appendChild(um);WS.writeMsgs.push({role:'user',content:text});
+  let ty=div('w-msg w-assist','<div class="w-m-av">AI</div><div class="typing-dots"><span></span><span></span><span></span></div>');
   ty.id='typingInd';body.appendChild(ty);body.scrollTop=body.scrollHeight;
   T('sendBtn').disabled=true;
   try{
-    let resp=await api('/api/chat',{method:'POST',body:JSON.stringify({messages:S.chatMsgs.slice(-10),provider_id:S.chatPid})});
+    let msgs=WS.writeMsgs.slice(-10);
+    // Add book context as system message
+    let book=WS.books.find(b=>b.id===WS.activeBookId);
+    let ctx=book?`[写作上下文: 《${book.title}》] `:'';
+    let resp=await api('/api/chat',{method:'POST',body:JSON.stringify({messages:[{role:'system',content:ctx+'你是一位专业小说写作助手，帮助作者创作。请保持自然的文风。'}].concat(msgs),provider_id:S.chatPid})});
     ty.remove();
-    let am=div('msg assistant',`<div class="m-av">AI</div><div><div class="m-bub">${E(resp.content)}</div><div class="m-time">${now()}</div></div>`);
-    body.appendChild(am);S.chatMsgs.push({role:'assistant',content:resp.content});
+    let am=div('w-msg w-assist',`<div class="w-m-av">✦</div><div><div class="w-m-bub">${E(resp.content)}</div><div class="w-m-time">${now()}</div></div>`);
+    body.appendChild(am);WS.writeMsgs.push({role:'assistant',content:resp.content});
     if(resp.tokens)updateStatus(resp.tokens);
-  }catch(e){ty.remove();let em=div('msg assistant',`<div class="m-av">AI</div><div><div class="m-bub">❌ ${E(e.message)}</div></div>`);body.appendChild(em)}
+  }catch(e){ty.remove();let em=div('w-msg w-assist',`<div class="w-m-av">✦</div><div><div class="w-m-bub">❌ ${E(e.message)}</div></div>`);body.appendChild(em)}
   T('sendBtn').disabled=false;body.scrollTop=body.scrollHeight;
 }
 function now(){return new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}
