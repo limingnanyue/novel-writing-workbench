@@ -1,12 +1,12 @@
-# LLM Gateway Dashboard v5.3 · 写作工作台
+# LLM Gateway Dashboard v6.0 · InkOS 重制
 
 > 📱 手机上的 LLM 管理面板 + AI 写作工作台 —— 管模型、写小说，一个面板搞定。
 
-[![Version](https://img.shields.io/badge/version-5.3-8b4513)](https://github.com/limingnanyue/novel-writing-workbench)
+[![Version](https://img.shields.io/badge/version-6.0-8b4513)](https://github.com/limingnanyue/novel-writing-workbench)
 [![PWA](https://img.shields.io/badge/PWA-ready-36c073)](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps)
 [![Zero Deps](https://img.shields.io/badge/frontend-zero_deps-36c073)]()
 
-**4Tab 移动+桌面双模式 · InkOS 纸质美学 · OpenWrite 写作方法论 · 零前端依赖**
+**4Tab InkOS 设计 · 暖纸色调 · 噪点纹理 · 3 层字体系统 · 零前端依赖**
 
 ## 功能
 
