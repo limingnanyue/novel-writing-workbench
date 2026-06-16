@@ -5,517 +5,1030 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <meta name="theme-color" content="#faf6f0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>InkOS 写作工作台</title>
+<title>InkOS Studio</title>
 <style>
 /* ═══════════════════════════════════════════
-   InkOS Design System — Novel Writing Workbench
+   InkOS Design System — Pure AI Writing Workbench
    ═══════════════════════════════════════════ */
+
+/* ── Light (default) ── */
 :root{
-  /* InkOS Light (Warm Parchment & Ink) */
-  --bg:oklch(0.985 0.005 80);
-  --s1:oklch(0.97 0.008 75);
-  --s2:oklch(0.94 0.008 72);
-  --s3:oklch(0.90 0.01 68);
-  --bd:oklch(0.84 0.01 76);
-  --be:oklch(0.80 0.012 72);
-  --ac:oklch(0.45 0.12 25);
-  --a2:oklch(0.50 0.10 28);
-  --su:oklch(0.55 0.12 150);
-  --wa:oklch(0.70 0.12 80);
-  --da:oklch(0.55 0.14 25);
-  --in:oklch(0.55 0.08 250);
-  --t1:oklch(0.13 0.02 60);
-  --t2:oklch(0.40 0.025 55);
-  --t3:oklch(0.60 0.02 65);
-  --gl:oklch(0.92 0.02 85);
-  /* InkOS Font System (3-tier) */
-  --font-serif:'Georgia','Songti SC','Noto Serif SC','STSong',serif;
-  --font-sans:'DM Sans','PingFang SC','PingFang','system-ui','-apple-system',sans-serif;
-  --font-mono:'JetBrains Mono','SF Mono','Fira Code','Consolas',monospace;
-  --r:10px;
-  --rs:6px;
-  --tr:.15s ease;
-  --sidebar-w:260px;
-  --shadow:0 1px 3px rgba(0,0,0,0.04),0 1px 2px rgba(0,0,0,0.02);
-  --shadow-lg:0 4px 16px rgba(0,0,0,0.06);
+  --background: oklch(0.985 0.005 80);
+  --foreground: oklch(0.13 0.02 60);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0.015 60);
+  --primary: oklch(0.45 0.12 25);
+  --primary-foreground: oklch(0.98 0.006 76);
+  --secondary: oklch(0.94 0.01 76);
+  --muted: oklch(0.94 0.008 76);
+  --muted-foreground: oklch(0.38 0.02 60);
+  --accent: oklch(0.92 0.02 85);
+  --destructive: oklch(0.55 0.18 25);
+  --border: oklch(0.84 0.01 76);
+  --radius: 0.6rem;
+  --ring: oklch(0.45 0.12 25);
+  --font-sans: 'DM Sans', system-ui, -apple-system, 'PingFang SC', sans-serif;
+  --font-serif: 'Instrument Serif', 'Georgia', 'Songti SC', serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+  --sidebar-w: 260px;
+  --header-h: 56px;
+  --tr: .15s ease;
+  --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.06);
 }
-[data-theme="dark"]{
-  --bg:oklch(0.12 0.01 250);
-  --s1:oklch(0.14 0.015 245);
-  --s2:oklch(0.18 0.02 240);
-  --s3:oklch(0.22 0.025 235);
-  --bd:oklch(0.25 0.03 230);
-  --be:oklch(0.30 0.035 225);
-  --ac:oklch(0.78 0.14 85);
-  --a2:oklch(0.70 0.12 80);
-  --gl:oklch(0.28 0.04 85);
-  --t1:oklch(0.78 0.14 85);
-  --t2:oklch(0.55 0.08 75);
-  --t3:oklch(0.35 0.04 70);
-  --su:oklch(0.55 0.12 140);
-  --wa:oklch(0.65 0.10 75);
-  --da:oklch(0.60 0.14 25);
-  --in:oklch(0.55 0.08 240);
-  --shadow:0 1px 3px rgba(0,0,0,0.2);
-  --shadow-lg:0 4px 16px rgba(0,0,0,0.3);
+
+/* ── Dark ── */
+.dark{
+  --background: oklch(0.12 0.01 250);
+  --foreground: oklch(0.97 0.005 250);
+  --card: oklch(0.18 0.015 250);
+  --card-foreground: oklch(0.97 0.005 250);
+  --primary: oklch(0.78 0.14 85);
+  --primary-foreground: oklch(0.12 0.01 250);
+  --secondary: oklch(0.22 0.02 250);
+  --muted: oklch(0.22 0.015 250);
+  --muted-foreground: oklch(0.55 0.04 250);
+  --accent: oklch(0.28 0.04 250);
+  --destructive: oklch(0.6 0.14 25);
+  --border: oklch(0.30 0.02 250);
+  --ring: oklch(0.78 0.14 85);
+  --shadow: 0 1px 3px rgba(0,0,0,0.2);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.3);
 }
+
+/* ── Reset ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{font-size:17px;height:100%;-webkit-tap-highlight-color:transparent}
-body{font-family:var(--font-sans);background:var(--bg);color:var(--t1);height:100%;overflow:hidden;-webkit-font-smoothing:antialiased;-webkit-user-select:none;user-select:none;line-height:1.72}
+html{font-size:16px;height:100%;-webkit-tap-highlight-color:transparent}
+body{
+  font-family: var(--font-sans);
+  background: var(--background);
+  color: var(--foreground);
+  height: 100%;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -webkit-user-select: none;
+  user-select: none;
+  line-height: 1.72;
+  transition: background var(--tr), color var(--tr);
+}
+/* SVG Noise Texture */
+body::before{
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.025;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
-::selection{background:var(--ac);color:var(--bg);opacity:0.85}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+::selection{background:var(--primary);color:var(--primary-foreground);opacity:0.85}
 h1,h2,h3,h4{font-family:var(--font-serif);font-weight:700;line-height:1.3}
 h1{font-size:1.15rem;font-style:italic}
 h2{font-size:.95rem}
 h3{font-size:.8rem}
 h4{font-size:.65rem}
-/* SVG Noise Texture */
-body::before{content:'';position:fixed;inset:0;z-index:-1;opacity:0.025;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")}
+a{color:var(--primary);text-decoration:none}
+
 /* ═══ App Shell ═══ */
-.app{display:flex;height:100%;max-width:480px;margin:0 auto;position:relative;flex-direction:column}
-/* Theme Toggle */
-.theme-toggle{position:fixed;top:8px;right:8px;z-index:50;width:30px;height:30px;border-radius:50%;border:1px solid var(--bd);background:var(--s1);color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.65rem;transition:all var(--tr);backdrop-filter:blur(12px)}.theme-toggle:active{transform:scale(.94)}
-/* Pages */
+.app{display:flex;height:100%;position:relative}
+.sidebar{display:none;flex-direction:column;width:var(--sidebar-w);background:var(--card);border-right:1px solid var(--border);flex-shrink:0;height:100vh;position:sticky;top:0;overflow:hidden;z-index:10}
+.main-area{flex:1;display:flex;flex-direction:column;min-width:0;height:100vh;overflow:hidden}
+
+/* ═══ Header ═══ */
+.header{
+  display: flex;
+  align-items: center;
+  height: var(--header-h);
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--background);
+  flex-shrink: 0;
+  gap: 10px;
+  transition: background var(--tr), border var(--tr);
+}
+.header-left{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
+.header-left .hc{font-size:.9rem;color:var(--muted-foreground)}
+.header-left .hb{font-size:.5rem;color:var(--muted-foreground);font-family:var(--font-mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.header-left .hb span{color:var(--primary);font-weight:600}
+.header-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.lang-toggle{display:flex;border-radius:calc(var(--radius) - 0.2rem);border:1px solid var(--border);overflow:hidden;flex-shrink:0}
+.lang-toggle button{padding:3px 8px;border:none;background:transparent;color:var(--muted-foreground);font-size:.4rem;font-family:var(--font-mono);cursor:pointer;transition:all var(--tr)}
+.lang-toggle button:active{transform:scale(.96)}
+.lang-toggle button.active{background:var(--primary);color:var(--primary-foreground)}
+.theme-btn{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--secondary);color:var(--muted-foreground);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.7rem;transition:all var(--tr);flex-shrink:0}
+.theme-btn:active{transform:scale(.92)}
+
+/* ═══ Pages Container ═══ */
 .pages{flex:1;overflow:hidden;position:relative}
 .page{position:absolute;inset:0;overflow-y:auto;display:none;-webkit-overflow-scrolling:touch}
 .page.active{display:flex;flex-direction:column}
-.pi{padding:14px 16px;padding-bottom:calc(14px + env(safe-area-inset-bottom,0) + 56px)}
-/* Tab Bar — mobile bottom */
-.tabbar{display:flex;background:var(--s1);border-top:1px solid var(--bd);flex-shrink:0;z-index:20;padding-bottom:env(safe-area-inset-bottom,0);height:calc(54px + env(safe-area-inset-bottom,0));backdrop-filter:blur(12px)}
-.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border:none;background:transparent;color:var(--t3);font-size:.38rem;font-family:var(--font-mono);cursor:pointer;transition:color var(--tr)}.tab .tic{font-size:.85rem;line-height:1}.tab.active{color:var(--ac)}.tab:active{opacity:.7}
-/* ═══ Sidebar (Desktop) ═══ */
-.sidebar{display:none;flex-direction:column;width:var(--sidebar-w);background:var(--s1);border-right:1px solid var(--bd);flex-shrink:0;z-index:10;height:100vh;position:sticky;top:0;backdrop-filter:blur(12px)}
-.sidebar .sb-brand{padding:20px 20px 14px;border-bottom:1px solid var(--bd)}
-.sidebar .sb-brand .sbn{font-size:.7rem;font-weight:700;font-family:var(--font-serif);color:var(--ac);font-style:italic}
-.sidebar .sb-brand .sbv{font-size:.38rem;color:var(--t3);font-family:var(--font-mono);margin-top:2px;letter-spacing:.02em}
-.sidebar .sb-brand .sb-ver{font-size:.35rem;color:var(--t3);font-family:var(--font-mono);margin-top:1px;opacity:.6}
-.sidebar .sb-stats{display:flex;align-items:center;gap:8px;padding:10px 20px;font-size:.38rem;color:var(--t3);font-family:var(--font-mono);border-bottom:1px solid var(--bd)}
-.sidebar .sb-stats .ss-dot{margin-right:auto}
-.sidebar .sbtabs{flex:1;padding:10px 0;overflow-y:auto}
-.sbtab{display:flex;align-items:center;gap:10px;width:100%;padding:10px 20px;border:none;background:transparent;color:var(--t3);font-size:.45rem;font-family:var(--font-sans);cursor:pointer;transition:all var(--tr);text-align:left}
-.sbtab .si{font-size:.8rem;width:24px;text-align:center;flex-shrink:0}
-.sbtab.active{color:var(--ac);background:linear-gradient(90deg,rgba(0,0,0,0.03),transparent)}
-[data-theme="dark"] .sbtab.active{background:linear-gradient(90deg,rgba(255,255,255,0.03),transparent)}
-.sbtab:hover{background:var(--s2)}.sbtab:active{transform:scale(.98)}
-.sb-count{font-size:.35rem;color:var(--t3);font-family:var(--font-mono);margin-left:auto;opacity:.6}
-.sidebar .sb-foot{padding:12px 20px;border-top:1px solid var(--bd);display:flex;flex-direction:column;gap:6px}
-.sidebar .sb-foot .sb-ft{font-size:.35rem;color:var(--t3);font-family:var(--font-mono);text-align:center}
-/* ═══ Dashboard / 工作台 ═══ */
-.dash-grid{padding:0;flex:1;overflow-y:auto}
-.dash-hero{padding:16px 20px 0}
-.dash-hero h1{font-size:1rem;color:var(--ac);margin-bottom:2px}
-.dash-hero .sub{font-size:.4rem;color:var(--t3);font-family:var(--font-mono)}
-.creation-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:12px 16px}
-.creation-entry{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:var(--r);border:1px solid var(--bd);background:var(--s1);cursor:pointer;transition:all var(--tr);font-size:.42rem;font-family:var(--font-sans);color:var(--t1)}
-.creation-entry .ce-ic{font-size:.7rem;width:28px;height:28px;border-radius:7px;background:var(--s2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.creation-entry .ce-t{font-weight:600;font-size:.44rem}
-.creation-entry .ce-s{font-size:.36rem;color:var(--t3);font-family:var(--font-mono)}
-.creation-entry:active{transform:scale(.97);background:var(--s2);border-color:var(--ac)}
-.creation-entry:nth-child(1){animation:staggerIn .3s ease both;animation-delay:0s}
-.creation-entry:nth-child(2){animation:staggerIn .3s ease both;animation-delay:.04s}
-.creation-entry:nth-child(3){animation:staggerIn .3s ease both;animation-delay:.08s}
-.creation-entry:nth-child(4){animation:staggerIn .3s ease both;animation-delay:.12s}
-.creation-entry:nth-child(5){animation:staggerIn .3s ease both;animation-delay:.16s}
-.creation-entry:nth-child(6){animation:staggerIn .3s ease both;animation-delay:.20s}
-.creation-entry:nth-child(7){animation:staggerIn .3s ease both;animation-delay:.24s}
-.creation-entry:nth-child(8){animation:staggerIn .3s ease both;animation-delay:.28s}
-@keyframes staggerIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.dash-sec{padding:0 16px}
-.dash-sec-h{display:flex;align-items:center;gap:6px;margin:10px 0 6px}
-.dash-sec-h .dsh-ic{font-size:.5rem;color:var(--ac)}
-.dash-sec-h .dsh-t{font-size:.5rem;font-weight:600;color:var(--t1);font-family:var(--font-sans)}
-.dash-sec-h .dsh-c{font-size:.38rem;color:var(--t3);font-family:var(--font-mono);margin-left:auto}
-/* Bookshelf */
-.bookshelf-toggle{display:flex;align-items:center;gap:7px;padding:8px 12px;cursor:pointer;font-size:.44rem;color:var(--t1);font-family:var(--font-sans);border:none;background:var(--s1);width:100%;text-align:left;border-radius:var(--rs);transition:all var(--tr);font-weight:600}
-.bookshelf-toggle:hover{background:var(--s2)}
-.bookshelf-toggle .bs-arr{transition:transform .2s ease;font-size:.38rem;color:var(--t3)}
-.bookshelf-toggle.bs-open .bs-arr{transform:rotate(90deg)}
-.bookshelf-collapse{display:grid;grid-template-rows:0fr;transition:grid-template-rows .25s ease;overflow:hidden}
-.bookshelf-collapse.bs-open{grid-template-rows:1fr}
-.bookshelf-collapse-inner{min-height:0;overflow:hidden}
-.bookshelf-collapse.bs-open .bookshelf-collapse-inner{overflow-y:auto;max-height:300px;padding:2px 0}
-.book-card{display:flex;align-items:center;gap:8px;padding:8px 12px;margin:2px 0;border-radius:var(--rs);cursor:pointer;transition:all var(--tr);border:1px solid transparent}
-.book-card:hover{background:var(--s2);border-color:var(--bd)}
-.book-card:active{transform:scale(.98)}
-.book-card.b-active{border-color:var(--ac);background:var(--s2)}
-.book-card .bc-ic{font-size:.55rem;width:24px;text-align:center;flex-shrink:0}
-.book-card .bc-info{flex:1;min-width:0}
-.book-card .bc-title{font-size:.44rem;font-weight:600;font-family:var(--font-sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.book-card .bc-meta{font-size:.35rem;color:var(--t3);font-family:var(--font-mono);margin-top:1px}
-.book-card .bc-acts{display:flex;gap:4px;flex-shrink:0}
-.book-card .bc-acts button{width:22px;height:22px;border-radius:4px;border:none;background:transparent;color:var(--t3);cursor:pointer;font-size:.4rem;display:flex;align-items:center;justify-content:center;transition:all var(--tr)}
-.book-card .bc-acts button:hover{background:var(--s3);color:var(--t1)}
-.book-card .bc-acts .bc-del:hover{color:var(--da);background:rgba(var(--da),0.1)}
-/* Stats Cards */
-.stat3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;padding:0 16px}
-.stat{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:12px 8px;text-align:center}
-.stat .sv{font-size:.7rem;font-weight:700;color:var(--ac);font-family:var(--font-mono)}
-.stat .sl{font-size:.36rem;color:var(--t3);margin-top:2px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.03em}
-/* Recent Sessions */
-.recent-list{padding:0 16px 10px}
-.recent-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--rs);cursor:pointer;transition:all var(--tr);font-size:.4rem;color:var(--t2);border:1px solid transparent}
-.recent-item:hover{background:var(--s2);border-color:var(--bd)}
-.recent-item .ri-ic{font-size:.5rem;flex-shrink:0}
-.recent-item .ri-t{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.recent-item .ri-time{font-size:.34rem;color:var(--t3);font-family:var(--font-mono);flex-shrink:0}
-/* ═══ Chat / Writing Page ═══ */
+.page-inner{padding:16px 20px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0))}
+
+/* ═══ Sidebar Brand ═══ */
+.sb-brand{
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sb-brand .sb-logo{flex-shrink:0}
+.sb-brand .sb-titles{}
+.sb-brand .sb-name{font-size:.75rem;font-weight:700;font-family:var(--font-serif);color:var(--primary);font-style:italic;letter-spacing:-.01em}
+.sb-brand .sb-ver{font-size:.35rem;color:var(--muted-foreground);font-family:var(--font-mono);margin-top:1px;letter-spacing:.03em}
+
+/* InkOS Logo SVG */
+.inkos-logo{width:36px;height:36px}
+
+/* ═══ Sidebar Sections ═══ */
+.sb-scroll{flex:1;overflow-y:auto;padding:6px 0}
+.sb-section{margin-bottom:4px}
+.sb-section-title{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 18px;
+  font-size: .4rem;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.sb-item{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px;
+  border: none;
+  background: transparent;
+  color: var(--card-foreground);
+  font-size: .44rem;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all var(--tr);
+  text-align: left;
+  width: 100%;
+  border-radius: 0;
+}
+.sb-item:hover{background:var(--secondary)}
+.sb-item:active{transform:scale(.98)}
+.sb-item .si{font-size:.7rem;width:24px;text-align:center;flex-shrink:0}
+.sb-item .sb-badge{font-size:.34rem;color:var(--muted-foreground);font-family:var(--font-mono);margin-left:auto;opacity:.7}
+.sb-item.active{color:var(--primary);background:var(--accent)}
+
+/* ── Creation grid in sidebar ── */
+.sb-creation{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px 14px;
+}
+.sb-creation .ce{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: calc(var(--radius) - 0.2rem);
+  border: 1px solid var(--border);
+  background: var(--card);
+  cursor: pointer;
+  transition: all var(--tr);
+  font-size: .38rem;
+  font-family: var(--font-sans);
+  color: var(--card-foreground);
+}
+.sb-creation .ce:hover{border-color:var(--primary);background:var(--secondary)}
+.sb-creation .ce:active{transform:scale(.97)}
+.sb-creation .ce .ce-ic{font-size:.55rem;flex-shrink:0}
+.sb-creation .ce .ce-t{font-weight:600;font-size:.38rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Stagger animation for creation grid */
+.sb-creation .ce:nth-child(1){animation:staggerIn .25s ease both;animation-delay:0s}
+.sb-creation .ce:nth-child(2){animation:staggerIn .25s ease both;animation-delay:.04s}
+.sb-creation .ce:nth-child(3){animation:staggerIn .25s ease both;animation-delay:.08s}
+.sb-creation .ce:nth-child(4){animation:staggerIn .25s ease both;animation-delay:.12s}
+.sb-creation .ce:nth-child(5){animation:staggerIn .25s ease both;animation-delay:.16s}
+.sb-creation .ce:nth-child(6){animation:staggerIn .25s ease both;animation-delay:.20s}
+.sb-creation .ce:nth-child(7){animation:staggerIn .25s ease both;animation-delay:.24s}
+.sb-creation .ce:nth-child(8){animation:staggerIn .25s ease both;animation-delay:.28s}
+
+/* ── Collapsible (bookshelf / history) ── */
+.coll-toggle{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  cursor: pointer;
+  font-size: .44rem;
+  color: var(--card-foreground);
+  font-family: var(--font-sans);
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  transition: all var(--tr);
+  font-weight: 600;
+}
+.coll-toggle:hover{background:var(--secondary)}
+.coll-toggle .co-arr{transition:transform .2s ease;font-size:.38rem;color:var(--muted-foreground)}
+.coll-toggle.open .co-arr{transform:rotate(90deg)}
+.coll-toggle .co-count{font-size:.35rem;color:var(--muted-foreground);font-family:var(--font-mono);margin-left:auto;opacity:.7}
+.coll-body{
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows .25s ease;
+  overflow: hidden;
+}
+.coll-body.open{grid-template-rows: 1fr}
+.coll-body-inner{min-height:0;overflow:hidden}
+.coll-body.open .coll-body-inner{overflow-y:auto;max-height:260px;padding:2px 0}
+
+/* Book / session items in sidebar */
+.sb-book-item,.sb-session-item{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 18px 6px 30px;
+  cursor: pointer;
+  transition: all var(--tr);
+  font-size: .4rem;
+  color: var(--card-foreground);
+  font-family: var(--font-sans);
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  border-left: 2px solid transparent;
+}
+.sb-book-item:hover,.sb-session-item:hover{background:var(--secondary);border-left-color:var(--border)}
+.sb-book-item.active,.sb-session-item.active{border-left-color:var(--primary);color:var(--primary);background:var(--accent)}
+.sb-book-item .bi-ic,.sb-session-item .si-ic{font-size:.45rem;flex-shrink:0}
+.sb-book-item .bi-t,.sb-session-item .si-t{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-book-item .bi-meta,.sb-session-item .si-meta{font-size:.32rem;color:var(--muted-foreground);font-family:var(--font-mono);flex-shrink:0}
+.sb-add-btn{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 18px 5px 30px;
+  cursor: pointer;
+  font-size: .38rem;
+  color: var(--muted-foreground);
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  transition: all var(--tr);
+  font-family: var(--font-sans);
+}
+.sb-add-btn:hover{color:var(--primary);background:var(--secondary)}
+
+/* ── Sidebar footer (agent status) ── */
+.sb-footer{
+  padding: 10px 18px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.agent-dot{
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: pulse 2s infinite;
+  flex-shrink: 0;
+}
+.sb-agent-label{font-size:.35rem;color:var(--muted-foreground);font-family:var(--font-mono);flex:1}
+.sb-agent-status{font-size:.32rem;color:var(--muted-foreground);font-family:var(--font-mono);opacity:.6}
+
+/* ═══ Dashboard ═══ */
+.dash-header{
+  padding: 20px 24px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dash-header h1{font-size:1rem;color:var(--primary);margin-bottom:2px}
+.dash-header .dh-sub{font-size:.4rem;color:var(--muted-foreground);font-family:var(--font-mono)}
+
+/* Paper sheet book cards */
+.books-grid{
+  display: grid;
+  gap: 12px;
+  padding: 16px 24px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+.paper-sheet{
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  position: relative;
+  transition: all var(--tr);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.paper-sheet:hover{box-shadow:var(--shadow-lg);border-color:var(--primary)}
+.paper-sheet:active{transform:scale(.98)}
+.paper-sheet .ps-top{display:flex;align-items:flex-start;gap:10px}
+.paper-sheet .ps-icon{font-size:1.4rem;flex-shrink:0;opacity:.8;line-height:1}
+.paper-sheet .ps-info{flex:1;min-width:0}
+.paper-sheet .ps-title{font-family:var(--font-serif);font-size:.85rem;font-weight:700;color:var(--card-foreground);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.paper-sheet .ps-genre{font-size:.35rem;color:var(--muted-foreground);font-family:var(--font-mono);display:inline-block;padding:1px 6px;border-radius:4px;background:var(--secondary)}
+.paper-sheet .ps-meta{display:flex;align-items:center;gap:10px;font-size:.38rem;color:var(--muted-foreground);font-family:var(--font-mono)}
+.paper-sheet .ps-meta .ps-dot{width:6px;height:6px;border-radius:50%;background:var(--primary)}
+.paper-sheet .ps-meta .ps-dot.draft{background:var(--destructive)}
+.paper-sheet .ps-meta .ps-dot.done{background:#22c55e}
+.paper-sheet .ps-actions{display:flex;gap:4px;margin-top:4px}
+.paper-sheet .ps-actions button{
+  flex: 1;
+  padding: 5px 8px;
+  border-radius: calc(var(--radius) - 0.3rem);
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--card-foreground);
+  font-size: .38rem;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all var(--tr);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.paper-sheet .ps-actions button:active{transform:scale(.97)}
+.paper-sheet .ps-actions button.prim{background:var(--primary);color:var(--primary-foreground);border-color:var(--primary)}
+.paper-sheet .ps-actions button.prim:active{opacity:.85}
+.paper-sheet .ps-actions .ps-more{
+  flex: 0 0 30px;
+  padding: 5px 0;
+  font-size: .5rem;
+}
+
+/* Manuscript Foundry */
+.manuscript-foundry{
+  margin: 0 24px 16px;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+.glass-panel{
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.dark .glass-panel{
+  background: rgba(0,0,0,0.15);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+.mf-header{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.mf-header .mfi{font-size:.6rem;color:var(--primary)}
+.mf-header .mft{font-size:.5rem;font-weight:600;color:var(--card-foreground);font-family:var(--font-sans)}
+.mf-body{font-size:.38rem;color:var(--muted-foreground);font-family:var(--font-mono);line-height:1.6;max-height:120px;overflow-y:auto}
+.mf-body .mf-entry{display:flex;gap:6px;padding:3px 0;border-bottom:1px solid var(--border);opacity:0;animation:fadeIn .3s ease forwards}
+.mf-body .mf-entry .mf-time{font-size:.32rem;color:var(--muted-foreground);flex-shrink:0;opacity:.6}
+.mf-body .mf-entry .mf-text{flex:1}
+
+/* Empty state for books */
+.books-empty{
+  padding: 30px 20px;
+  text-align: center;
+  color: var(--muted-foreground);
+  font-size: .42rem;
+  font-family: var(--font-sans);
+}
+.books-empty .be-ic{font-size:2rem;margin-bottom:8px;opacity:.3}
+
+/* ═══ Chat Page ═══ */
 .chat-wrap{display:flex;flex-direction:column;flex:1;min-height:0}
-.chat-body{flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:6px}
-.chat-empty-w{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--t3);padding:30px}
-.chat-empty-w .ce-ic{font-size:2.2rem;opacity:.12}
-.chat-empty-w .ce-t{font-size:.55rem;color:var(--t2);font-weight:600;font-family:var(--font-serif)}
-.chat-empty-w .ce-s{font-size:.4rem;max-width:260px;text-align:center;line-height:1.6;color:var(--t3);font-family:var(--font-sans)}
+.chat-body{flex:1;overflow-y:auto;padding:10px 16px;display:flex;flex-direction:column;gap:8px}
+.chat-empty{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--muted-foreground);
+  padding: 40px 20px;
+}
+.chat-empty .ce-ic{font-size:2.5rem;opacity:.12}
+.chat-empty .ce-t{font-size:.6rem;color:var(--card-foreground);font-weight:600;font-family:var(--font-serif)}
+.chat-empty .ce-s{font-size:.42rem;max-width:280px;text-align:center;line-height:1.6;color:var(--muted-foreground);font-family:var(--font-sans)}
+
 /* Messages */
-.msg{display:flex;gap:8px;max-width:88%;margin-bottom:2px}
+.msg{display:flex;gap:8px;max-width:85%;margin-bottom:4px}
 .msg.user{align-self:flex-end;flex-direction:row-reverse;animation:msgSlideRight .25s ease}
 .msg.assistant{align-self:flex-start;animation:msgSlideLeft .25s ease}
-@keyframes msgSlideRight{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
-@keyframes msgSlideLeft{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
-.msg .m-av{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.5rem;box-shadow:var(--shadow)}
-.msg.user .m-av{background:var(--ac);color:#fff}
-.msg.assistant .m-av{background:var(--s2);color:var(--ac);border:1px solid var(--bd)}
-.msg .m-bub{padding:9px 14px;border-radius:12px;font-size:.45rem;line-height:1.72;white-space:pre-wrap;word-break:break-word}
-.msg.user .m-bub{background:var(--ac);color:#fff;border-bottom-right-radius:4px}
-[data-theme="dark"] .msg.user .m-bub{background:var(--s3);color:var(--t1);border:1px solid var(--bd)}
-.msg.assistant .m-bub{background:var(--s1);color:var(--t1);border:1px solid var(--bd);border-bottom-left-radius:4px;font-family:var(--font-serif)}
-.msg .m-time{font-size:.34rem;color:var(--t3);margin-top:3px;font-family:var(--font-mono)}
-/* Typing Indicator */
-.typing-dots{display:flex;gap:4px;padding:8px 12px}
-.typing-dots span{width:5px;height:5px;border-radius:50%;background:var(--t3);animation:typingWave 1.2s infinite}
-.typing-dots span:nth-child(2){animation-delay:.15s}
-.typing-dots span:nth-child(3){animation-delay:.3s}
+@keyframes msgSlideRight{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:translateX(0)}}
+@keyframes msgSlideLeft{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:translateX(0)}}
+.msg .m-av{
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .5rem;
+  box-shadow: var(--shadow);
+}
+.msg.user .m-av{background:var(--primary);color:var(--primary-foreground)}
+.msg.assistant .m-av{background:var(--secondary);color:var(--primary);border:1px solid var(--border)}
+.msg .m-bub{
+  padding: 9px 14px;
+  border-radius: 12px;
+  font-size: .45rem;
+  line-height: 1.72;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.msg.user .m-bub{background:var(--primary);color:var(--primary-foreground);border-bottom-right-radius:4px}
+.msg.assistant .m-bub{background:var(--card);color:var(--card-foreground);border:1px solid var(--border);border-bottom-left-radius:4px;font-family:var(--font-serif)}
+.msg .m-time{font-size:.34rem;color:var(--muted-foreground);margin-top:3px;font-family:var(--font-mono)}
+
+/* Typing indicator */
+.typing-indicator{display:flex;gap:4px;padding:8px 12px}
+.typing-indicator span{width:6px;height:6px;border-radius:50%;background:var(--muted-foreground);animation:typingWave 1.2s infinite}
+.typing-indicator span:nth-child(2){animation-delay:.15s}
+.typing-indicator span:nth-child(3){animation-delay:.3s}
 @keyframes typingWave{0%,60%,100%{opacity:.2;transform:scale(.8)}30%{opacity:1;transform:scale(1)}}
-/* Quick Actions Bar */
-.qa-bar{display:flex;gap:4px;padding:8px 14px 4px;overflow-x:auto;flex-shrink:0;-webkit-overflow-scrolling:touch;border-bottom:1px solid var(--bd)}
+
+/* Quick actions */
+.qa-bar{
+  display: flex;
+  gap: 4px;
+  padding: 8px 16px 6px;
+  overflow-x: auto;
+  flex-shrink: 0;
+  -webkit-overflow-scrolling: touch;
+  border-bottom: 1px solid var(--border);
+}
 .qa-bar::-webkit-scrollbar{height:0}
-.qa-btn{flex-shrink:0;padding:5px 10px;border-radius:8px;font-size:.38rem;border:1px solid var(--bd);cursor:pointer;background:var(--s1);color:var(--t2);font-family:var(--font-sans);white-space:nowrap;transition:all var(--tr);display:flex;align-items:center;gap:4px}
-.qa-btn:active{background:var(--s2);transform:scale(.97);border-color:var(--ac);color:var(--ac)}
-.qa-btn:hover{border-color:var(--ac);color:var(--ac)}
-/* Chat Foot */
-.chat-foot{flex-shrink:0;padding:6px 14px 8px;border-top:1px solid var(--bd);background:var(--bg)}
-.chat-foot-top{display:flex;align-items:center;gap:6px;margin-bottom:5px}
-.chat-foot-top select{flex:1;margin-bottom:0}
+.qa-btn{
+  flex-shrink: 0;
+  padding: 5px 10px;
+  border-radius: calc(var(--radius) - 0.2rem);
+  font-size: .38rem;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  background: var(--card);
+  color: var(--card-foreground);
+  font-family: var(--font-sans);
+  white-space: nowrap;
+  transition: all var(--tr);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.qa-btn:active{transform:scale(.97)}
+.qa-btn:hover{border-color:var(--primary);color:var(--primary)}
+
+/* Chat input */
+.chat-foot{flex-shrink:0;padding:6px 16px 10px;border-top:1px solid var(--border);background:var(--background);transition:background var(--tr)}
+.chat-foot-top{display:flex;align-items:center;gap:6px;margin-bottom:6px}
 .chat-inp{display:flex;align-items:flex-end;gap:6px}
-.chat-inp textarea{flex:1;padding:8px 12px;border-radius:12px;border:1px solid var(--bd);background:var(--s1);color:var(--t1);font-size:.45rem;resize:none;outline:none;font-family:var(--font-sans);line-height:1.5;max-height:100px;transition:border-color var(--tr)}
-.chat-inp textarea:focus{border-color:var(--ac);box-shadow:0 0 0 2px rgba(0,0,0,0.02)}
-.chat-inp .snd{width:32px;height:32px;border-radius:50%;border:none;background:var(--ac);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.65rem;flex-shrink:0;transition:all var(--tr);box-shadow:var(--shadow)}
-.chat-inp .snd:active{transform:scale(.94)}
-.chat-inp .snd:disabled{background:var(--s3);color:var(--t3);box-shadow:none}
-/* ═══ Provider / Models Tab ═══ */
-.prov-list{padding:0}
-.prov-list-inner{padding:0 16px 10px}
-.pcard{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:10px 12px;margin-bottom:5px;cursor:pointer;transition:all var(--tr)}
-.pcard:active,.pcard:hover{border-color:var(--ac)}
-.pcard.sel{border-color:var(--ac);background:var(--s2);box-shadow:0 0 0 1px var(--ac)}
-.pcard .pr{display:flex;align-items:center;gap:8px}
-.pcard .pav{width:32px;height:32px;border-radius:8px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:.6rem;flex-shrink:0;border:1px solid var(--bd)}
-.pcard .pi{flex:1;min-width:0}
-.pcard .pn{font-size:.48rem;font-weight:600;font-family:var(--font-sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pcard .pu{font-size:.36rem;color:var(--t3);font-family:var(--font-mono);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pcard .badge{font-size:.34rem;padding:2px 7px;border-radius:5px;font-family:var(--font-mono);white-space:nowrap;font-weight:600}
-.pcard .badge.ok{background:var(--su);color:#fff}
-.pcard .badge.err{background:var(--da);color:#fff}
-.pcard .badge.info{background:var(--in);color:#fff}
-.pcard .chev{color:var(--t3);font-size:.48rem;flex-shrink:0;transition:transform var(--tr)}
-.pcard .model-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:6px;padding-top:6px;border-top:1px solid var(--bd)}
-.pcard .model-tags span{font-size:.34rem;padding:2px 6px;border-radius:4px;background:var(--s2);color:var(--t2);font-family:var(--font-mono);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-/* Detail Panel (desktop right side) */
-.detail-panel{display:none}
-.detail-panel-inner{padding:0 20px 20px}
-.detail-panel .dp-head{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--bd)}
-.detail-panel .dp-head h3{font-size:.55rem;font-weight:600;font-family:var(--font-serif);color:var(--ac)}
-.detail-panel .dp-meta{font-size:.4rem;color:var(--t3);font-family:var(--font-mono);margin-bottom:10px;padding:0 20px;margin-top:10px}
-.detail-panel .dp-actions{display:flex;gap:6px;margin-bottom:14px;padding:0 20px}
-.desk-layout{display:flex;gap:0;flex:1;min-height:0;height:100%}
-.desk-list{width:340px;border-right:1px solid var(--bd);overflow-y:auto;padding:0;flex-shrink:0}
-.desk-list .pi{padding:14px 0}
-.detail-panel{flex:1;overflow-y:auto;display:flex;flex-direction:column;background:var(--s1)}
-.detail-panel .dp-empty{flex:1;display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:.45rem;font-family:var(--font-mono);flex-direction:column;gap:10px}
-.detail-panel .dp-empty .dpe-ic{font-size:2rem;opacity:.2}
-/* Model list */
-.mlist{display:flex;flex-direction:column;gap:2px;padding:0 20px}
-.mitem{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:var(--rs);font-size:.42rem;font-family:var(--font-mono)}
-.mitem:nth-child(odd){background:var(--s2)}
-.mitem .mid{flex:1;color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.mitem .mby{font-size:.36rem;color:var(--t3)}
-/* ═══ Settings Tab ═══ */
-.set-sec-h{display:flex;align-items:center;gap:6px;margin:14px 0 6px;padding:0 16px}
-.set-sec-h .ssh-ic{font-size:.5rem;color:var(--ac)}
-.set-sec-h .ssh-t{font-size:.5rem;font-weight:600;font-family:var(--font-sans)}
-.set-sec-h .ssh-c{font-size:.38rem;color:var(--t3);font-family:var(--font-mono);margin-left:auto}
-.set-about{padding:0 16px;font-size:.4rem;color:var(--t3);font-family:var(--font-mono);line-height:1.8}
-/* ═══ Sheets (mobile) ═══ */
-.overlay{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.35);animation:ov-in .15s ease;backdrop-filter:blur(4px)}
+.chat-inp textarea{
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--card-foreground);
+  font-size: .45rem;
+  resize: none;
+  outline: none;
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  max-height: 100px;
+  transition: border-color var(--tr), background var(--tr);
+}
+.chat-inp textarea:focus{border-color:var(--primary);box-shadow:0 0 0 2px var(--accent)}
+.chat-inp .snd-btn{
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .7rem;
+  flex-shrink: 0;
+  transition: all var(--tr);
+}
+.chat-inp .snd-btn:active{transform:scale(.92)}
+.chat-inp .snd-btn:disabled{background:var(--secondary);color:var(--muted-foreground)}
+
+/* Think glow */
+.think-glow{animation:thinkGlow 1.5s ease-in-out infinite}
+@keyframes thinkGlow{0%,100%{box-shadow:0 0 8px var(--primary);opacity:.6}50%{box-shadow:0 0 20px var(--primary);opacity:1}}
+
+/* ═══ Settings Page ═══ */
+.set-sec{
+  margin-bottom: 16px;
+  padding: 0;
+}
+.set-sec-h{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding: 0 4px;
+}
+.set-sec-h .ssh-ic{font-size:.55rem;color:var(--primary)}
+.set-sec-h .ssh-t{font-size:.5rem;font-weight:600;font-family:var(--font-sans);color:var(--card-foreground)}
+.set-sec-h .ssh-c{font-size:.38rem;color:var(--muted-foreground);font-family:var(--font-mono);margin-left:auto;opacity:.7}
+
+/* Model balance cards */
+.balance-grid{
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+.balance-card{
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  transition: all var(--tr);
+}
+.balance-card:hover{border-color:var(--primary)}
+.balance-card .bc-name{font-size:.48rem;font-weight:600;color:var(--card-foreground);font-family:var(--font-sans);margin-bottom:2px;display:flex;align-items:center;gap:6px}
+.balance-card .bc-name .bc-ic{font-size:.6rem}
+.balance-card .bc-url{font-size:.34rem;color:var(--muted-foreground);font-family:var(--font-mono);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.balance-card .bc-usage{display:flex;gap:10px;font-size:.36rem;font-family:var(--font-mono);color:var(--muted-foreground)}
+.balance-card .bc-usage .bc-val{color:var(--primary);font-weight:600}
+
+/* Settings items */
+.set-item{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: .44rem;
+  color: var(--card-foreground);
+  font-family: var(--font-sans);
+}
+.set-item:last-child{border-bottom:none}
+.set-item .si-label{display:flex;align-items:center;gap:8px}
+.set-item .si-label .si-ic{font-size:.55rem}
+.set-item .si-val{font-size:.38rem;color:var(--muted-foreground);font-family:var(--font-mono)}
+
+.set-about{
+  padding: 0 4px;
+  font-size: .4rem;
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  line-height: 1.8;
+}
+.set-about .about-logo{margin-bottom:8px}
+
+/* ═══ Mobile Tab Bar ═══ */
+.tabbar{display:none}
+.mobile-tabbar{
+  display: flex;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  z-index: 20;
+  padding-bottom: env(safe-area-inset-bottom,0);
+  height: calc(52px + env(safe-area-inset-bottom,0));
+}
+.mobile-tab{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border: none;
+  background: transparent;
+  color: var(--muted-foreground);
+  font-size: .36rem;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  transition: color var(--tr);
+}
+.mobile-tab .mti{font-size:.75rem;line-height:1}
+.mobile-tab.active{color:var(--primary)}
+.mobile-tab:active{opacity:.7}
+
+/* ═══ Sheet (mobile bottom sheet) ═══ */
+.overlay{display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.35);animation:fadeIn .15s ease;backdrop-filter:blur(4px)}
 .overlay.show{display:block}
-.sheet{position:fixed;bottom:0;left:50%;transform:translate(-50%,100%);width:100%;max-width:480px;max-height:85vh;background:var(--bg);border:1px solid var(--bd);border-radius:16px 16px 0 0;z-index:101;display:flex;flex-direction:column;transition:transform .25s cubic-bezier(.4,0,.2,1);box-shadow:var(--shadow-lg)}
+.sheet{
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 100%);
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px 16px 0 0;
+  z-index: 101;
+  display: flex;
+  flex-direction: column;
+  transition: transform .25s cubic-bezier(.4,0,.2,1);
+}
 .sheet.show{transform:translate(-50%,0)}
-.sh{width:36px;height:4px;border-radius:2px;background:var(--bd);margin:10px auto 0;flex-shrink:0;opacity:.5}
-.shead{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--bd);flex-shrink:0}
-.shead h4{font-size:.52rem;font-weight:600;font-family:var(--font-serif)}
-.sclose{width:28px;height:28px;border-radius:7px;border:none;background:var(--s2);color:var(--t2);cursor:pointer;font-size:.55rem;display:flex;align-items:center;justify-content:center;transition:all var(--tr)}.sclose:active{transform:scale(.93)}
+.sh-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:10px auto 0;flex-shrink:0;opacity:.5}
+.shead{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.shead h4{font-size:.52rem;font-weight:600;font-family:var(--font-serif);color:var(--card-foreground)}
+.sclose{width:28px;height:28px;border-radius:7px;border:none;background:var(--secondary);color:var(--muted-foreground);cursor:pointer;font-size:.55rem;display:flex;align-items:center;justify-content:center;transition:all var(--tr)}
+.sclose:active{transform:scale(.93)}
 .sbody{flex:1;overflow-y:auto;padding:12px 16px 24px;-webkit-overflow-scrolling:touch}
+
 /* ═══ Form Elements ═══ */
 .fg{margin-bottom:8px}
-.fg label{display:block;font-size:.4rem;color:var(--t2);font-family:var(--font-mono);margin-bottom:4px;font-weight:600;letter-spacing:.02em}
-.inp{width:100%;padding:8px 12px;border-radius:var(--rs);border:1px solid var(--bd);background:var(--s1);color:var(--t1);font-size:.45rem;outline:none;font-family:var(--font-sans);transition:border-color var(--tr)}
-.inp:focus{border-color:var(--ac);box-shadow:0 0 0 2px rgba(0,0,0,0.02)}
-.inp::placeholder{color:var(--t3);font-size:.4rem}
+.fg label{display:block;font-size:.4rem;color:var(--muted-foreground);font-family:var(--font-mono);margin-bottom:4px;font-weight:600;letter-spacing:.02em}
+.inp{
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: calc(var(--radius) - 0.2rem);
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--card-foreground);
+  font-size: .45rem;
+  outline: none;
+  font-family: var(--font-sans);
+  transition: border-color var(--tr);
+}
+.inp:focus{border-color:var(--primary)}
+.inp::placeholder{color:var(--muted-foreground);font-size:.4rem}
 select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+
 /* ═══ Buttons ═══ */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:7px 14px;border-radius:var(--rs);font-size:.42rem;cursor:pointer;font-family:var(--font-sans);background:var(--s2);color:var(--t1);border:1px solid var(--bd);transition:all var(--tr);white-space:nowrap;font-weight:500}
+.btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px 14px;
+  border-radius: calc(var(--radius) - 0.2rem);
+  font-size: .42rem;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  background: var(--secondary);
+  color: var(--card-foreground);
+  border: 1px solid var(--border);
+  transition: all var(--tr);
+  white-space: nowrap;
+  font-weight: 500;
+}
 .btn:active{transform:scale(.97)}
-.btn.pri{background:var(--ac);color:#fff;border-color:var(--a2);font-weight:600}
-[data-theme="dark"] .btn.pri{color:var(--bg)}
-.btn.dan{background:transparent;border-color:var(--da);color:var(--da)}
-.btn.dan:hover{background:rgba(0,0,0,0.03)}
+.btn.pri{background:var(--primary);color:var(--primary-foreground);border-color:var(--primary)}
+.btn.dan{background:transparent;border-color:var(--destructive);color:var(--destructive)}
 .btn.full{width:100%;justify-content:center}
 .btn.sm{padding:4px 10px;font-size:.38rem}
 .btn .bic{font-size:.6rem}
 .btn:disabled{opacity:.5;cursor:default}
+
 /* ═══ Toast ═══ */
-.toast{position:fixed;top:50px;left:50%;transform:translate(-50%,-20px);background:var(--s2);border:1px solid var(--bd);color:var(--t1);padding:8px 16px;border-radius:20px;font-size:.42rem;font-family:var(--font-mono);z-index:200;opacity:0;transition:all .25s ease;pointer-events:none;white-space:nowrap;box-shadow:var(--shadow-lg);backdrop-filter:blur(12px)}
-.toast.show{opacity:1;transform:translate(-50%,0)}.toast.good{color:var(--ac)}.toast.bad{color:var(--da)}
-/* ═══ Misc ═══ */
-.empty{text-align:center;padding:20px 0;color:var(--t3);font-size:.4rem;font-family:var(--font-mono)}
-.result{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:10px 12px;margin-top:6px;font-size:.4rem;font-family:var(--font-mono);line-height:1.6;color:var(--t2);white-space:pre-wrap;word-break:break-word;max-height:200px;overflow-y:auto}
-.result.ok{border-color:var(--su)}.result.err{border-color:var(--da)}
-.skel{background:linear-gradient(90deg,var(--s1)25%,var(--s2)50%,var(--s1)75%);background-size:200% 100%;animation:skel 1.5s infinite;border-radius:var(--rs)}
+.toast{
+  position: fixed;
+  top: 50px;
+  left: 50%;
+  transform: translate(-50%, -20px);
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--card-foreground);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: .42rem;
+  font-family: var(--font-mono);
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow: var(--shadow-lg);
+  transition: opacity .2s ease, transform .2s ease;
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.good{color:var(--primary)}
+.toast.bad{color:var(--destructive)}
+
+/* ═══ Animations ═══ */
+@keyframes staggerIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes iconPop{0%{transform:scale(0);opacity:0}50%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
 @keyframes skel{0%{background-position:200% 0}100%{background-position:-200% 0}}
-.pulse{animation:pulse 1.5s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 @keyframes ov-in{from{opacity:0}}
-@keyframes thinkGlow{0%,100%{box-shadow:0 0 8px var(--ac);opacity:.6}50%{box-shadow:0 0 20px var(--ac);opacity:1}}
-/* Desk header for mobile */
-.desk-header{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--bd);flex-shrink:0}
-.desk-header h2{font-size:.6rem;font-family:var(--font-serif);color:var(--ac)}
-.desk-header .dh-meta{font-size:.36rem;color:var(--t3);font-family:var(--font-mono);margin-left:auto}
+@keyframes navIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Utility ── */
+.skel{
+  background: linear-gradient(90deg, var(--secondary) 25%, var(--muted) 50%, var(--secondary) 75%);
+  background-size: 200% 100%;
+  animation: skel 1.5s infinite;
+  border-radius: var(--radius);
+}
+.empty{text-align:center;padding:20px 0;color:var(--muted-foreground);font-size:.4rem;font-family:var(--font-mono)}
+.result{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;margin-top:6px;font-size:.4rem;font-family:var(--font-mono);line-height:1.6;color:var(--muted-foreground);white-space:pre-wrap;word-break:break-word;max-height:200px;overflow-y:auto}
+.result.ok{border-color:var(--primary)}.result.err{border-color:var(--destructive)}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+.dot.on{background:#22c55e;animation:pulse 2s infinite}
+.dot.off{background:var(--muted-foreground)}
+
 /* ═══════════════════════════════════════════
-   DESKTOP — 768px+
+   RESPONSIVE: Desktop 768px+
    ═══════════════════════════════════════════ */
 @media(min-width:768px){
-  .app{max-width:100%;flex-direction:row}
   .sidebar{display:flex!important}
-  .tabbar{display:none}
-  .theme-toggle{display:none}
-  .desk-header{display:none}
-  .pages{flex:1;min-width:0}
-  .page .pi{padding:20px 0 0}
-  /* Dashboard desktop layout */
-  .dash-grid{padding:0}
-  .dash-hero{padding:20px 24px 0}
-  .dash-hero h1{font-size:1.15rem}
-  .creation-grid{gap:8px;padding:14px 24px}
-  .creation-entry{padding:12px 14px;font-size:.44rem;border-radius:var(--r)}
-  .creation-entry:hover{border-color:var(--ac);background:var(--s2)}
-  .stat3{gap:10px;margin-bottom:14px;padding:0 24px}.stat{padding:14px 10px}.stat .sv{font-size:.85rem}.stat .sl{font-size:.38rem}
-  .dash-sec{padding:0 24px}
-  .dash-sec-h{margin:14px 0 8px}
-  .recent-list{padding:0 24px 14px}
-  .bookshelf-toggle{padding:10px 14px;font-size:.46rem}
-  .book-card{padding:9px 14px}
-  /* Chat desktop */
-  .chat-body{padding:14px 24px;gap:8px}
+  .mobile-tabbar{display:none!important}
+  .header{display:flex!important}
+  .page-inner{padding:20px 0 0}
+  .dash-header{padding:20px 28px 0}
+  .books-grid{padding:16px 28px;gap:14px}
+  .manuscript-foundry{margin:0 28px 16px}
+  .chat-body{padding:14px 24px;gap:10px}
   .qa-bar{padding:10px 24px 6px;gap:6px}
   .qa-btn{padding:6px 12px;font-size:.4rem}
   .msg .m-bub{font-size:.48rem;padding:10px 16px}
   .chat-foot{padding:8px 24px 12px}
   .chat-inp textarea{font-size:.48rem;padding:10px 14px}
-  .chat-inp .snd{width:36px;height:36px;font-size:.7rem}
-  .chat-foot-top select{padding:5px 10px;font-size:.4rem}
-  /* Provider page desktop */
-  .prov-list-inner{padding:0;display:flex;gap:0;flex:1;min-height:0}
-  .desk-list{width:360px;border-right:1px solid var(--bd);overflow-y:auto;padding:0;flex-shrink:0}
-  .desk-list.wider{width:380px}
-  .pcard{padding:12px 14px;margin-bottom:4px;cursor:pointer}
-  .pcard:hover:not(.sel){border-color:var(--bd);background:var(--s2)}
-  .detail-panel{flex:1;overflow-y:auto;display:flex;flex-direction:column;border-left:none}
-  .dp-empty .dpe-ic{font-size:2.2rem}
-  /* Settings desktop */
-  .set-sec-h{margin:18px 0 8px;padding:0 24px}
-  .set-about{padding:0 24px;font-size:.42rem}
-  /* Sheets — hidden on desktop, use detail panel instead */
-  .overlay.show{display:none}
-  .sh,.shead .sh{display:none}
-  .sheet{position:static;transform:none;max-width:none;max-height:none;border-radius:0;border:none;height:100%;background:transparent;box-shadow:none}
-  .sbody{padding:20px 24px}
-  .sclose{display:none}
-  .empty{font-size:.42rem}
-  .result{font-size:.42rem;max-height:300px}
-  .inp{padding:9px 14px;font-size:.48rem}
-  .btn{padding:8px 16px;font-size:.44rem}
-  .btn.sm{padding:5px 12px;font-size:.4rem}
+  .chat-inp .snd-btn{width:36px;height:36px;font-size:.75rem}
+  .balance-grid{gap:10px}
+  .balance-card{padding:14px}
+  .set-sec-h{margin-bottom:10px}
+  .sb-creation{gap:6px;padding:6px 16px}
+  .sb-creation .ce{padding:8px 10px;font-size:.4rem}
 }
+
 /* ═══════════════════════════════════════════
-   WIDE DESKTOP — 1200px+
+   RESPONSIVE: Mobile <768px
+   ═══════════════════════════════════════════ */
+@media(max-width:767px){
+  .sidebar{display:none!important}
+  .header{display:none!important}
+  .app{flex-direction:column}
+  .main-area{height:calc(100% - 52px - env(safe-area-inset-bottom,0))}
+  .mobile-tabbar{display:flex!important}
+  .page-inner{padding:14px 16px;padding-bottom:calc(14px + env(safe-area-inset-bottom,0))}
+  .dash-header{padding:14px 16px 0}
+  .books-grid{padding:12px 16px;gap:10px;grid-template-columns:1fr}
+  .manuscript-foundry{margin:0 16px 12px}
+  .books-empty .be-ic{font-size:1.6rem}
+}
+
+/* ═══════════════════════════════════════════
+   WIDE DESKTOP 1200px+
    ═══════════════════════════════════════════ */
 @media(min-width:1200px){
   :root{--sidebar-w:280px}
-  .desk-list{width:400px}
-  .desk-list.wider{width:420px}
-  .stat3{grid-template-columns:repeat(3,1fr)}.stat .sv{font-size:1rem}
-  .dash-hero h1{font-size:1.3rem}
-  .creation-grid{grid-template-columns:1fr 1fr 1fr 1fr}
+  .books-grid{grid-template-columns:repeat(auto-fill, minmax(280px, 1fr))}
+  .dash-header h1{font-size:1.15rem}
 }
 </style>
 </head>
 <body>
 
-<!-- Desktop Theme Toggle -->
-<button class="theme-toggle" id="themeBtn" onclick="toggleTheme()" title="切换主题">◐</button>
-
 <!-- ═══ DESKTOP SIDEBAR ═══ -->
 <div class="sidebar" id="sidebar">
   <div class="sb-brand">
-    <div class="sbn">InkOS 写作坊</div>
-    <div class="sbv">Novel Writing Workbench</div>
-    <div class="sb-ver">v6.0 · InkOS 重制</div>
+    <svg class="inkos-logo" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="18" cy="18" r="17" fill="#1a1a1a"/>
+      <path d="M12 22c0-4 4-10 6-12l3 3c-2 3-5 7-5 9s2 2 3 1l1-1c1-2 2-5 2-5" stroke="#ff6b35" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+      <path d="M20 11l2 2 1.5-1.5c.5-.5 1.5-.5 2 0l.5.5c.5.5.5 1.5 0 2L24 16" stroke="#d4a843" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+      <circle cx="15" cy="23" r="1.5" fill="#ff6b35" opacity="0.6"/>
+      <circle cx="22" cy="12" r="1" fill="#d4a843" opacity="0.8"/>
+    </svg>
+    <div class="sb-titles">
+      <div class="sb-name">InkOS</div>
+      <div class="sb-ver">Studio v6.0</div>
+    </div>
   </div>
-  <div class="sb-stats">
-    <span class="dot on ss-dot" id="sbDot"></span>
-    <span>Token</span>
-    <span id="sbTk">···</span>
+
+  <div class="sb-scroll">
+    <!-- CREATION 2x4 Grid -->
+    <div class="sb-section">
+      <div class="sb-section-title">CREATION</div>
+      <div class="sb-creation">
+        <div class="ce" onclick="quickWrite('novel')"><span class="ce-ic">📖</span><span class="ce-t">长篇小说</span></div>
+        <div class="ce" onclick="quickWrite('short')"><span class="ce-ic">📜</span><span class="ce-t">短篇</span></div>
+        <div class="ce" onclick="quickWrite('fanfic')"><span class="ce-ic">✒️</span><span class="ce-t">同人</span></div>
+        <div class="ce" onclick="quickWrite('side')"><span class="ce-ic">📑</span><span class="ce-t">番外</span></div>
+        <div class="ce" onclick="quickWrite('imitate')"><span class="ce-ic">🪄</span><span class="ce-t">仿写</span></div>
+        <div class="ce" onclick="quickWrite('continue')"><span class="ce-ic">📥</span><span class="ce-t">续写</span></div>
+        <div class="ce" onclick="quickWrite('branch')"><span class="ce-ic">🔀</span><span class="ce-t">分支互动</span></div>
+        <div class="ce" onclick="quickWrite('openworld')"><span class="ce-ic">🎮</span><span class="ce-t">开放</span></div>
+      </div>
+    </div>
+
+    <!-- 我的书架 (My Bookshelf) -->
+    <div class="sb-section">
+      <button class="coll-toggle open" id="bsToggle" onclick="toggleCollapse('bs')">
+        <span class="co-arr">▶</span> 我的书架
+        <span class="co-count" id="bsCount">0</span>
+      </button>
+      <div class="coll-body open" id="bsCollapse">
+        <div class="coll-body-inner" id="bsContent">
+          <div class="empty" style="padding:10px 0;font-size:.36rem">暂无书籍</div>
+        </div>
+      </div>
+      <button class="sb-add-btn" onclick="createBook()">＋ 新建会话</button>
+    </div>
+
+    <!-- 历史记录 (History) -->
+    <div class="sb-section">
+      <button class="coll-toggle" id="histToggle" onclick="toggleCollapse('hist')">
+        <span class="co-arr">▶</span> 历史记录
+        <span class="co-count" id="histCount">0</span>
+      </button>
+      <div class="coll-body" id="histCollapse">
+        <div class="coll-body-inner" id="histContent">
+          <div class="empty" style="padding:10px 0;font-size:.36rem">暂无记录</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SYSTEM Section -->
+    <div class="sb-section">
+      <div class="sb-section-title">SYSTEM</div>
+      <div id="balanceSidebar"></div>
+      <button class="sb-item" onclick="navTo('settings')"><span class="si">⚙️</span>项目设置</button>
+      <button class="sb-item" onclick="navTo('settings')"><span class="si">⚡</span>Daemon</button>
+      <button class="sb-item" onclick="navTo('settings')"><span class="si">⌨️</span>日志</button>
+    </div>
+
+    <!-- TOOLS Section -->
+    <div class="sb-section">
+      <div class="sb-section-title">TOOLS</div>
+      <button class="sb-item" onclick="navTo('settings')"><span class="si">🪄</span>风格</button>
+      <button class="sb-item" onclick="navTo('settings')"><span class="si">📥</span>导入</button>
+      <button class="sb-item" onclick="navTo('chat')"><span class="si">📈</span>雷达</button>
+      <button class="sb-item" onclick="navTo('chat')"><span class="si">🩺</span>诊断</button>
+    </div>
   </div>
-  <div class="sbtabs">
-    <button class="sbtab active" onclick="switchTab(0)"><span class="si">⌘</span>工作台 <span class="sb-count" id="sbBookCount"></span></button>
-    <button class="sbtab" onclick="switchTab(1)"><span class="si">💬</span>对话 <span class="sb-count" id="sbChatCount"></span></button>
-    <button class="sbtab" onclick="switchTab(2)"><span class="si">🔌</span>模型 <span class="sb-count" id="sbProvCount"></span></button>
-    <button class="sbtab" onclick="switchTab(3)"><span class="si">⚙️</span>设置</button>
-  </div>
-  <div class="sb-foot">
-    <button class="btn pri full sm" onclick="sheetAdd()">＋ 添加提供商</button>
-    <div class="sb-ft" id="sbFooterInfo">点击工作台开始创作</div>
+
+  <!-- Agent Status -->
+  <div class="sb-footer">
+    <span class="agent-dot"></span>
+    <span class="sb-agent-label">Agent online</span>
+    <span class="sb-agent-status" id="agentPing">200ms</span>
   </div>
 </div>
 
-<!-- ═══ MAIN APP ═══ -->
-<div class="app" id="appMain">
+<!-- ═══ MAIN AREA ═══ -->
+<div class="main-area" id="mainArea">
+  <!-- Top Header -->
+  <div class="header" id="mainHeader">
+    <div class="header-left">
+      <span class="hc">🏠</span>
+      <span class="hb"><span>首页</span> / InkOS Studio</span>
+    </div>
+    <div class="header-right">
+      <div class="lang-toggle">
+        <button class="active" id="langZh" onclick="setLang('zh')">中</button>
+        <button id="langEn" onclick="setLang('en')">EN</button>
+      </div>
+      <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="切换主题">🌙</button>
+    </div>
+  </div>
+
+  <!-- Pages -->
   <div class="pages" id="pages">
-
-    <!-- ══════ Page 1: 工作台 (Dashboard) ══════ -->
-    <div class="page active" id="pg-dash">
-      <div class="dash-grid" id="dashGrid">
-        <div class="dash-hero">
-          <h1>⌘ 创作入口</h1>
-          <div class="sub">InkOS 写作工作台 · 开卷有益</div>
+    <!-- ══════ Dashboard ══════ -->
+    <div class="page active" id="pg-dashboard">
+      <div class="page-inner" style="padding-bottom:0">
+        <div class="dash-header">
+          <h1>⌘ 工作台</h1>
+          <span class="dh-sub">InkOS Studio · 开卷有益</span>
         </div>
-
-        <!-- 2×4 Creation Entry Grid -->
-        <div class="creation-grid" id="creationGrid">
-          <div class="creation-entry" onclick="quickWrite('continue')"><div class="ce-ic">📖</div><div><div class="ce-t">长篇小说</div><div class="ce-s">结构完整</div></div></div>
-          <div class="creation-entry" onclick="quickWrite('continue')"><div class="ce-ic">✍️</div><div><div class="ce-t">短篇小说</div><div class="ce-s">一气呵成</div></div></div>
-          <div class="creation-entry" onclick="quickWrite('characters')"><div class="ce-ic">🔄</div><div><div class="ce-t">同人创作</div><div class="ce-s">角色延续</div></div></div>
-          <div class="creation-entry" onclick="quickWrite('continue')"><div class="ce-ic">⭐</div><div><div class="ce-t">番外创作</div><div class="ce-s">衍生故事</div></div></div>
-          <div class="creation-entry" onclick="quickWrite('continue')"><div class="ce-ic">🎭</div><div><div class="ce-t">仿写创作</div><div class="ce-s">风格模仿</div></div></div>
-          <div class="creation-entry" onclick="quickWrite('continue')"><div class="ce-ic">📜</div><div><div class="ce-t">续写创作</div><div class="ce-s">接续剧情</div></div></div>
-          <div class="creation-entry" onclick="quickWrite('golden3')"><div class="ce-ic">🎲</div><div><div class="ce-t">分支互动</div><div class="ce-s">多线选择</div></div></div>
-          <div class="creation-entry" onclick="quickWrite('outline')"><div class="ce-ic">🌍</div><div><div class="ce-t">开放世界</div><div class="ce-s">宏大设定</div></div></div>
+        <!-- Books Grid -->
+        <div class="books-grid" id="booksGrid">
+          <div class="books-empty" id="booksEmpty">
+            <div class="be-ic">📖</div>
+            <div>还没有书籍，点击「开新书」开始创作</div>
+          </div>
         </div>
-
-        <!-- Stats Row -->
-        <div class="stat3" id="statsRow"><div class="skel" style="height:55px"></div><div class="skel" style="height:55px"></div><div class="skel" style="height:55px"></div></div>
-
-        <!-- Bookshelf -->
-        <div class="dash-sec">
-          <button class="bookshelf-toggle bs-open" id="bsToggle" onclick="toggleBookshelf()"><span class="bs-arr">▶</span> 我的书架 <span class="dsh-c" id="bsCount">0</span></button>
-          <div class="bookshelf-collapse bs-open" id="bsCollapse"><div class="bookshelf-collapse-inner" id="bsContent"><div class="empty">暂无书籍，点击「开新书」开始创作</div></div></div>
-          <button class="btn full sm" style="margin-top:4px" onclick="createBook()">＋ 开新书</button>
-        </div>
-
-        <!-- Recent Sessions -->
-        <div class="dash-sec">
-          <div class="dash-sec-h"><span class="dsh-ic">🕐</span><span class="dsh-t">最近</span></div>
-          <div class="recent-list" id="recentList"><div class="empty">暂无写作记录</div></div>
+        <!-- Manuscript Foundry -->
+        <div class="manuscript-foundry glass-panel" id="foundryPanel">
+          <div class="mf-header">
+            <span class="mfi">📜</span>
+            <span class="mft">Manuscript Foundry</span>
+          </div>
+          <div class="mf-body" id="foundryBody">
+            <div class="mf-entry" style="opacity:1">
+              <span class="mf-time">--:--</span>
+              <span class="mf-text">写作工坊待命中</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- ══════ Page 2: 对话 (Writing Chat) ══════ -->
+    <!-- ══════ Chat ══════ -->
     <div class="page" id="pg-chat">
-      <div class="chat-wrap" id="chatWrap">
-        <!-- Desktop Header -->
-        <div class="desk-header"><h2>💬 对话</h2><span class="dh-meta" id="chatBookLabel">未选择书籍</span></div>
+      <div class="chat-wrap">
         <!-- Quick Actions -->
         <div class="qa-bar" id="qaBar">
-          <button class="qa-btn" onclick="quickWrite('continue')">📝 续写</button>
-          <button class="qa-btn" onclick="quickWrite('new_chapter')">📑 新章节</button>
-          <button class="qa-btn" onclick="quickWrite('outline')">📋 大纲</button>
-          <button class="qa-btn" onclick="quickWrite('characters')">👤 角色</button>
-          <button class="qa-btn" onclick="quickWrite('golden3')">🏆 黄金三章</button>
-          <button class="qa-btn" onclick="quickWrite('anti_ai')">🔬 去AI味</button>
-          <button class="qa-btn" onclick="quickWrite('quality')">✅ 质检</button>
-          <button class="qa-btn" onclick="quickWrite('save')">💾 保存</button>
-          <button class="qa-btn" onclick="createBook()">📚 开新书</button>
+          <button class="qa-btn" onclick="quickWrite('continue')">⚡写下一章</button>
+          <button class="qa-btn" onclick="quickWrite('audit')">🔍审计</button>
+          <button class="qa-btn" onclick="quickWrite('export')">📄导出</button>
+          <button class="qa-btn" onclick="quickWrite('radar')">📈市场雷达</button>
         </div>
         <!-- Chat Body -->
         <div class="chat-body" id="chatBody">
-          <div class="chat-empty-w" id="chatEmpty">
-            <div class="ce-ic">✍️</div>
-            <div class="ce-t">AI 写作工作台</div>
-            <div class="ce-s">选择一本书，点击上方快捷指令开始创作。左侧「工作台」管理书架、大纲和角色。</div>
+          <div class="chat-empty" id="chatEmpty">
+            <div class="ce-ic">📖</div>
+            <div class="ce-t">告诉我你想写什么...</div>
+            <div class="ce-s">选择一本书，输入写作指令开始创作。左侧「工作台」管理书架、大纲和角色。</div>
           </div>
         </div>
-        <!-- Chat Footer -->
+        <!-- Chat Input -->
         <div class="chat-foot">
           <div class="chat-foot-top">
-            <select class="inp" id="chatProv" style="margin-bottom:0;font-size:.4rem;padding:5px 10px;flex:2"></select>
-            <select class="inp" id="chatBookSel" style="margin-bottom:0;font-size:.4rem;padding:5px 10px;flex:1" onchange="chatSelectBook(this.value)"><option value="">选择书籍</option></select>
+            <select class="inp" id="chatModel" style="margin-bottom:0;font-size:.38rem;padding:4px 10px;flex:2"><option value="">选择模型</option></select>
+            <select class="inp" id="chatBookSel" style="margin-bottom:0;font-size:.38rem;padding:4px 10px;flex:1" onchange="chatSelectBook(this.value)"><option value="">选择书籍</option></select>
           </div>
           <div class="chat-inp">
-            <textarea id="chatInput" rows="1" placeholder="输入写作指令或对话..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendWriteChat()}"></textarea>
-            <button class="snd" id="sendBtn" onclick="sendWriteChat()">↑</button>
+            <textarea id="chatInput" rows="1" placeholder="输入写作指令..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"></textarea>
+            <button class="snd-btn" id="sendBtn" onclick="sendChat()">↑</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ══════ Page 3: 模型 (Models) ══════ -->
-    <div class="page" id="pg-models">
-      <div class="desk-layout">
-        <div class="desk-list wider">
-          <div class="pi">
-            <div class="dash-sec-h" style="margin:0 0 8px"><span class="dsh-ic">🔌</span><span class="dsh-t">提供商</span><span class="dsh-c" id="modelProvCount">0</span></div>
-            <div id="modelList"><div class="skel" style="height:44px"></div></div>
-            <button class="btn full sm" style="margin-top:8px" onclick="sheetAdd()">＋ 添加提供商</button>
+    <!-- ══════ Settings ══════ -->
+    <div class="page" id="pg-settings">
+      <div class="page-inner">
+        <!-- Model Balance -->
+        <div class="set-sec">
+          <div class="set-sec-h">
+            <span class="ssh-ic">📦</span>
+            <span class="ssh-t">模型余额</span>
+            <span class="ssh-c" id="balanceCount">加载中...</span>
+          </div>
+          <div class="balance-grid" id="balanceGrid">
+            <div class="skel" style="height:70px"></div>
           </div>
         </div>
-        <div class="detail-panel" id="modelDetail">
-          <div class="dp-empty"><div class="dpe-ic">🔌</div><div>选择提供商查看详情</div></div>
+        <!-- System Settings -->
+        <div class="set-sec">
+          <div class="set-sec-h">
+            <span class="ssh-ic">⚙️</span>
+            <span class="ssh-t">系统设置</span>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+            <div class="set-item"><span class="si-label"><span class="si-ic">🌐</span>语言</span><span class="si-val" id="setLang">中文</span></div>
+            <div class="set-item"><span class="si-label"><span class="si-ic">🎨</span>主题</span><span class="si-val" id="setTheme">浅色</span></div>
+            <div class="set-item"><span class="si-label"><span class="si-ic">📁</span>数据存储</span><span class="si-val">本地 (localStorage)</span></div>
+          </div>
         </div>
-      </div>
-    </div>
-
-    <!-- ══════ Page 4: 设置 (Settings) ══════ -->
-    <div class="page" id="pg-set">
-      <div class="pi">
-        <div class="set-sec-h"><span class="ssh-ic">🔌</span><span class="ssh-t">提供商管理</span><button class="btn sm" style="margin-left:auto" onclick="sheetAdd()">＋</button></div>
-        <div id="setProvs" style="padding:0 16px"><div class="empty">加载中...</div></div>
-        <div class="set-sec-h"><span class="ssh-ic">📊</span><span class="ssh-t">统计</span></div>
-        <div id="tokInfo" style="padding:0 16px"><div class="skel" style="height:44px"></div></div>
-        <button class="btn dan sm" style="margin:6px 16px" onclick="resetTok()">重置统计</button>
-        <div class="set-sec-h"><span class="ssh-ic">ℹ️</span><span class="ssh-t">关于</span></div>
-        <div class="set-about">
-          InkOS 写作工作台 · Novel Writing Workbench<br>
-          v6.0 · InkOS 设计 · 纯前端 · 零依赖<br>
-          鲁班打磨 · Nous Research
+        <!-- About -->
+        <div class="set-sec">
+          <div class="set-sec-h">
+            <span class="ssh-ic">ℹ️</span>
+            <span class="ssh-t">关于</span>
+          </div>
+          <div class="set-about">
+            <div class="about-logo">
+              <svg class="inkos-logo" viewBox="0 0 36 36" fill="none" style="width:28px;height:28px;display:inline-block;vertical-align:middle;margin-right:6px" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="18" cy="18" r="17" fill="#1a1a1a"/>
+                <path d="M12 22c0-4 4-10 6-12l3 3c-2 3-5 7-5 9s2 2 3 1l1-1c1-2 2-5 2-5" stroke="#ff6b35" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+                <path d="M20 11l2 2 1.5-1.5c.5-.5 1.5-.5 2 0l.5.5c.5.5.5 1.5 0 2L24 16" stroke="#d4a843" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+                <circle cx="15" cy="23" r="1.5" fill="#ff6b35" opacity="0.6"/>
+                <circle cx="22" cy="12" r="1" fill="#d4a843" opacity="0.8"/>
+              </svg>
+              InkOS Studio
+            </div>
+            Pure AI Writing Workbench<br>
+            v6.0 · InkOS Design · Zero Dependencies<br>
+            由 Nous Research 打磨 · 开卷有益
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Mobile Tab Bar -->
-  <nav class="tabbar">
-    <button class="tab active" data-idx="0"><span class="tic">⌘</span>工作台</button>
-    <button class="tab" data-idx="1"><span class="tic">💬</span>对话</button>
-    <button class="tab" data-idx="2"><span class="tic">🔌</span>模型</button>
-    <button class="tab" data-idx="3"><span class="tic">⚙️</span>设置</button>
-  </nav>
+  <div class="mobile-tabbar" id="mobileTabbar">
+    <button class="mobile-tab active" data-route="dashboard"><span class="mti">⌘</span>工作台</button>
+    <button class="mobile-tab" data-route="chat"><span class="mti">💬</span>对话</button>
+    <button class="mobile-tab" data-route="settings"><span class="mti">⚙️</span>设置</button>
+  </div>
 </div>
 
-<!-- ═══ Sheets (mobile bottom / desktop overlay) ═══ -->
+<!-- ═══ Sheet (bottom sheet) ═══ -->
 <div class="overlay" id="overlay" onclick="closeSheet()"></div>
 <div class="sheet" id="sheet">
-  <div class="sh"></div>
+  <div class="sh-handle"></div>
   <div class="shead"><h4 id="sheetTitle">详情</h4><button class="sclose" onclick="closeSheet()">✕</button></div>
   <div class="sbody" id="sheetBody"></div>
 </div>
@@ -523,359 +1036,621 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
 
 <script>
 /* ═══════════════════════════════════════════
-   InkOS Writing Workbench — JS
+   InkOS Studio — Pure AI Writing Workbench
    ═══════════════════════════════════════════ */
 
-// ── State ──
-const S={provs:[],curTab:0,selPid:'',chatMsgs:[],chatPid:''};
-const T=id=>document.getElementById(id);
-const E=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const isDesktop=()=>window.innerWidth>=768;
+// ── Constants ──
+const IS_INKOS = true;
+const T = id => document.getElementById(id);
+const E = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const now = () => new Date().toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'});
+const isDesktop = () => window.innerWidth >= 768;
 
-// ── Theme ──
-function toggleTheme(){
-  let d=document.documentElement;
-  if(d.getAttribute('data-theme')==='dark'){d.removeAttribute('data-theme');T('themeBtn').textContent='◐';localStorage.setItem('inkos_theme','light')}
-  else{d.setAttribute('data-theme','dark');T('themeBtn').textContent='◑';localStorage.setItem('inkos_theme','dark')}
-}
-(function(){let t=localStorage.getItem('inkos_theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');T('themeBtn').textContent='◑'}})();
+// ── Writing State (localStorage with inkos prefix) ──
+const WS = {books:[], activeBookId:'', chapters:{}, characters:{}, outline:{}, ledger:{}, writeMsgs:[], models:[]};
 
-// ── Tab Switching ──
-function switchTab(idx){
-  S.curTab=idx;
-  document.querySelectorAll('.page').forEach((e,i)=>e.classList.toggle('active',i===idx));
-  document.querySelectorAll('.tab').forEach((e,i)=>e.classList.toggle('active',i===idx));
-  document.querySelectorAll('.sbtab').forEach((e,i)=>e.classList.toggle('active',i===idx));
-  if(idx===0)loadDash();
-  if(idx===1)loadChat();
-  if(idx===2)loadModels();
-  if(idx===3)loadSettings();
-}
-document.querySelectorAll('.tab').forEach((t,i)=>t.onclick=()=>switchTab(i));
-document.querySelectorAll('.sbtab').forEach((t,i)=>t.onclick=()=>switchTab(i));
-
-// ── Toast ──
-let _tt;
-function toast(msg,type=''){
-  let t=T('toast');t.textContent=msg;t.className='toast show '+type;
-  clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),1800);
-}
-
-// ── Sheet ──
-function openSheet(title,html){
-  T('sheetTitle').textContent=title;T('sheetBody').innerHTML=html;
-  if(isDesktop()){
-    T('sheet').style.cssText='position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;overflow-y:auto;max-width:560px;margin:40px auto;border-radius:14px;border:1px solid var(--bd);max-height:calc(100vh - 80px);box-shadow:var(--shadow-lg)';
-  }else{
-    T('overlay').classList.add('show');T('sheet').classList.add('show');
-  }
-}
-function closeSheet(){
-  T('overlay').classList.remove('show');T('sheet').classList.remove('show');
-  T('sheet').style.cssText='';
-  if(isDesktop()&&S.selPid)loadDetail(S.selPid);
-  loadDash();
-}
-
-// ── API ──
-async function api(u,o={}){
-  let r=await fetch(u,{headers:{'Content-Type':'application/json',...o.headers},...o});
-  if(!r.ok){let e=await r.json().catch(()=>({}));throw new Error(e.detail||`HTTP ${r.status}`)}
-  return r.json();
-}
-function updateStatus(tk){
-  let v=tk>=1e3?(tk/1e3).toFixed(1)+'K':String(tk);
-  if(T('sbTk'))T('sbTk').textContent=v;
-}
-
-// ── Bookshelf toggle ──
-function toggleBookshelf(){
-  let tg=T('bsToggle'),cl=T('bsCollapse');
-  tg.classList.toggle('bs-open');cl.classList.toggle('bs-open');
-}
-
-// ── ═══ Dashboard ═══ ──
-async function loadDash(){
+(function wsLoad(){
   try{
-    let[h,p]=await Promise.all([api('/api/health'),api('/api/providers')]);
-    S.provs=p.providers||[];
-    updateStatus(h.total_tokens);
-    T('statsRow').innerHTML=`<div class="stat"><div class="sv">${h.providers_count}</div><div class="sl">提供商</div></div>
-      <div class="stat"><div class="sv">${h.models_count}</div><div class="sl">模型</div></div>
-      <div class="stat"><div class="sv">${h.total_requests}</div><div class="sl">请求</div></div>`;
-    T('sbBookCount').textContent=WS.books.length?'📚'+WS.books.length:'';
-    T('sbProvCount').textContent=h.providers_count?'🔌'+h.providers_count:'';
-    T('sbFooterInfo').textContent=WS.books.length?'共 '+WS.books.length+' 本书 · 开始写作':'点击工作台开始创作';
-    renderBookshelf();
-    renderRecentSessions();
+    let d = localStorage.getItem('inkos_ws_data');
+    if(d){
+      let p = JSON.parse(d);
+      WS.books = p.books || [];
+      WS.activeBookId = p.activeBookId || '';
+      WS.chapters = p.chapters || {};
+      WS.characters = p.characters || {};
+      WS.outline = p.outline || {};
+      WS.ledger = p.ledger || {};
+      WS.writeMsgs = p.writeMsgs || [];
+      WS.models = p.models || [];
+    }
+  }catch(e){}
+})();
+
+(function wsMigrate(){
+  try{
+    let d = localStorage.getItem('ws_data');
+    if(d && !localStorage.getItem('inkos_ws_data')){
+      let p = JSON.parse(d);
+      p.writeMsgs = [];
+      localStorage.setItem('inkos_ws_data', JSON.stringify(p));
+      Object.assign(WS, {books:p.books||[], activeBookId:p.activeBookId||'', chapters:p.chapters||{}, characters:p.characters||{}, outline:p.outline||{}, ledger:p.ledger||{}, writeMsgs:[]});
+    }
+  }catch(e){}
+})();
+
+function wsSave(){
+  try{
+    localStorage.setItem('inkos_ws_data', JSON.stringify({
+      books: WS.books, activeBookId: WS.activeBookId,
+      chapters: WS.chapters, characters: WS.characters,
+      outline: WS.outline, ledger: WS.ledger,
+      writeMsgs: WS.writeMsgs, models: WS.models
+    }));
   }catch(e){}
 }
 
-function renderBookshelf(){
-  let cont=T('bsContent');if(!cont)return;
-  let cnt=T('bsCount');if(cnt)cnt.textContent=WS.books.length;
-  if(!WS.books.length){cont.innerHTML='<div class="empty">暂无书籍，点击「开新书」开始创作</div>';return}
-  cont.innerHTML=WS.books.map(b=>{
-    let chs=WS.chapters[b.id]||[],wc=chs.reduce((s,c)=>s+(c.wordCount||0),0);
-    let isActive=WS.activeBookId===b.id;
-    return `<div class="book-card${isActive?' b-active':''}" onclick="selectBook('${b.id}')">
-      <span class="bc-ic">${isActive?'📖':'📕'}</span>
-      <div class="bc-info"><div class="bc-title">${E(b.title)}</div><div class="bc-meta">${chs.length}章 · ${wc}字</div></div>
-      <div class="bc-acts">
-        <button onclick="event.stopPropagation();switchTab(1);chatSelectBook('${b.id}')" title="写作">💬</button>
-        <button class="bc-del" onclick="event.stopPropagation();deleteBook('${b.id}')" title="删除">✕</button>
+// ── Theme ──
+function toggleTheme(){
+  let d = document.documentElement;
+  d.classList.toggle('dark');
+  let isDark = d.classList.contains('dark');
+  T('themeBtn').textContent = isDark ? '☀️' : '🌙';
+  localStorage.setItem('inkos_theme', isDark ? 'dark' : 'light');
+  T('setTheme').textContent = isDark ? '深色' : '浅色';
+}
+
+(function initTheme(){
+  let t = localStorage.getItem('inkos_theme');
+  if(t === 'dark'){
+    document.documentElement.classList.add('dark');
+    T('themeBtn').textContent = '☀️';
+    T('setTheme').textContent = '深色';
+  }
+})();
+
+// ── Language ──
+let currentLang = localStorage.getItem('inkos_lang') || 'zh';
+function setLang(l){
+  currentLang = l;
+  localStorage.setItem('inkos_lang', l);
+  T('langZh').classList.toggle('active', l === 'zh');
+  T('langEn').classList.toggle('active', l === 'en');
+  T('setLang').textContent = l === 'zh' ? '中文' : 'English';
+}
+setLang(currentLang);
+
+// ── Hash-based Routing ──
+const ROUTES = {dashboard:0, chat:1, settings:2};
+const PAGE_IDS = ['pg-dashboard', 'pg-chat', 'pg-settings'];
+const TAB_ICONS = ['⌘', '💬', '⚙️'];
+
+function navTo(route){
+  window.location.hash = route;
+}
+
+function handleRoute(){
+  let hash = window.location.hash.replace('#', '') || 'dashboard';
+  let idx = ROUTES[hash] !== undefined ? ROUTES[hash] : 0;
+  // Show page
+  document.querySelectorAll('.page').forEach((el, i) => el.classList.toggle('active', i === idx));
+  document.querySelectorAll('.mobile-tab').forEach((el) => el.classList.toggle('active', el.dataset.route === hash));
+  // Update header breadcrumb
+  let names = {dashboard:'工作台', chat:'对话', settings:'设置'};
+  let headerLabel = T('mainHeader')?.querySelector('.hb span');
+  if(headerLabel) headerLabel.textContent = names[hash] || '首页';
+  // Load content
+  if(idx === 0) loadDashboard();
+  if(idx === 1) loadChat();
+  if(idx === 2) loadSettings();
+}
+
+window.addEventListener('hashchange', handleRoute);
+document.querySelectorAll('.mobile-tab').forEach(t => {
+  t.onclick = () => navTo(t.dataset.route);
+});
+
+// ── Toast ──
+let _tt;
+function toast(msg, type=''){
+  let t = T('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  clearTimeout(_tt);
+  _tt = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// ── Sheet ──
+function openSheet(title, html){
+  T('sheetTitle').textContent = title;
+  T('sheetBody').innerHTML = html;
+  if(isDesktop()){
+    T('sheet').style.cssText = 'position:fixed;inset:0;z-index:100;background:var(--card);display:flex;flex-direction:column;overflow-y:auto;max-width:560px;margin:40px auto;border-radius:14px;border:1px solid var(--border);max-height:calc(100vh - 80px);box-shadow:var(--shadow-lg)';
+  }else{
+    T('overlay').classList.add('show');
+    T('sheet').classList.add('show');
+  }
+}
+function closeSheet(){
+  T('overlay').classList.remove('show');
+  T('sheet').classList.remove('show');
+  T('sheet').style.cssText = '';
+}
+
+// ── Collapse Toggle ──
+function toggleCollapse(id){
+  let tog = T(id + 'Toggle');
+  let col = T(id + 'Collapse');
+  if(tog && col){
+    tog.classList.toggle('open');
+    col.classList.toggle('open');
+  }
+}
+
+// ── API ──
+async function api(u, o={}){
+  let r = await fetch(u, {headers:{'Content-Type':'application/json', ...o.headers}, ...o});
+  if(!r.ok){
+    let e = await r.json().catch(()=>({}));
+    throw new Error(e.detail || 'HTTP ' + r.status);
+  }
+  return r.json();
+}
+
+// ── Dashboard ──
+async function loadDashboard(){
+  try{
+    let [h, p] = await Promise.all([
+      api('/api/health').catch(() => ({providers_count:0, models_count:0, total_requests:0, total_tokens:0, is_inkos:true})),
+      api('/api/providers').catch(() => ({providers:[]}))
+    ]);
+    WS.models = (p.providers || []).filter(x => x.model);
+    // Render books grid
+    renderBooksGrid();
+    // Render sidebar bookshelf
+    renderSidebarBookshelf();
+    renderSidebarHistory();
+    renderBalanceSidebar();
+    // Foundry log
+    addFoundryEntry('写作工坊已就绪 · ' + WS.books.length + '本书 · ' + WS.models.length + '个模型');
+    // Agent ping
+    if(h.total_tokens !== undefined){
+      T('agentPing').textContent = (h.total_tokens || 0) + 't';
+    }
+  }catch(e){
+    renderBooksGrid();
+    renderSidebarBookshelf();
+    renderSidebarHistory();
+  }
+}
+
+function renderBooksGrid(){
+  let grid = T('booksGrid');
+  let empty = T('booksEmpty');
+  if(!grid) return;
+  if(!WS.books.length){
+    grid.innerHTML = '<div class="books-empty"><div class="be-ic">📖</div><div>还没有书籍，点击「开新书」开始创作</div></div>';
+    return;
+  }
+  grid.innerHTML = WS.books.map(b => {
+    let chs = WS.chapters[b.id] || [];
+    let wc = chs.reduce((s,c) => s + (c.wordCount || 0), 0);
+    let isActive = WS.activeBookId === b.id;
+    let statusClass = chs.length > 0 ? (chs.length > 3 ? 'done' : 'draft') : 'draft';
+    let genre = b.genre || '未分类';
+    let icon = isActive ? '📖' : '📕';
+    return `<div class="paper-sheet" onclick="selectBook('${b.id}')">
+      <div class="ps-top">
+        <div class="ps-icon">${icon}</div>
+        <div class="ps-info">
+          <div class="ps-title">${E(b.title)}</div>
+          <span class="ps-genre">${E(genre)}</span>
+        </div>
+      </div>
+      <div class="ps-meta">
+        <span class="ps-dot ${statusClass}"></span>
+        <span>${chs.length} 章</span>
+        <span>${wc.toLocaleString()} 字</span>
+      </div>
+      <div class="ps-actions">
+        <button class="prim" onclick="event.stopPropagation();navTo('chat')">⚡ Write Next</button>
+        <button onclick="event.stopPropagation();openBookStats('${b.id}')">📊 Stats</button>
+        <button class="ps-more" onclick="event.stopPropagation();openBookMenu('${b.id}')">⋮</button>
       </div>
     </div>`;
   }).join('');
 }
 
-function renderRecentSessions(){
-  let cont=T('recentList');if(!cont)return;
-  let recent=WS.writeMsgs.slice(-5).reverse();
-  if(!recent.length){cont.innerHTML='<div class="empty">暂无写作记录</div>';return}
-  cont.innerHTML=recent.map((m,i)=>`<div class="recent-item" onclick="switchTab(1)"><span class="ri-ic">${m.role==='user'?'👤':'✦'}</span><span class="ri-t">${E(m.content.slice(0,50))}${m.content.length>50?'...':''}</span></div>`).join('');
+function renderSidebarBookshelf(){
+  let cont = T('bsContent');
+  let cnt = T('bsCount');
+  if(!cont) return;
+  if(cnt) cnt.textContent = WS.books.length;
+  if(!WS.books.length){
+    cont.innerHTML = '<div class="empty" style="padding:10px 0;font-size:.36rem">暂无书籍</div>';
+    return;
+  }
+  cont.innerHTML = WS.books.map(b => {
+    let chs = WS.chapters[b.id] || [];
+    let wc = chs.reduce((s,c) => s + (c.wordCount || 0), 0);
+    let isActive = WS.activeBookId === b.id;
+    return `<button class="sb-book-item${isActive?' active':''}" onclick="selectBook('${b.id}')">
+      <span class="bi-ic">${isActive?'📖':'📕'}</span>
+      <span class="bi-t">${E(b.title)}</span>
+      <span class="bi-meta">${chs.length}章</span>
+    </button>`;
+  }).join('');
 }
 
-// ── ═══ Chat / Writing ═══ ──
-function loadChat(){
-  if(!S.provs.length)api('/api/providers').then(p=>{S.provs=p.providers||[];chatRenderProvs()});
-  else chatRenderProvs();
+function renderSidebarHistory(){
+  let cont = T('histContent');
+  let cnt = T('histCount');
+  if(!cont) return;
+  let recent = WS.writeMsgs.slice(-5).reverse().filter(m => m.role === 'user');
+  if(cnt) cnt.textContent = recent.length;
+  if(!recent.length){
+    cont.innerHTML = '<div class="empty" style="padding:10px 0;font-size:.36rem">暂无记录</div>';
+    return;
+  }
+  cont.innerHTML = recent.map(m => {
+    let label = m.content.slice(0, 30) + (m.content.length > 30 ? '...' : '');
+    return `<button class="sb-session-item" onclick="navTo('chat')">
+      <span class="si-ic">💬</span>
+      <span class="si-t">${E(label)}</span>
+    </button>`;
+  }).join('');
+}
+
+function renderBalanceSidebar(){
+  let cont = T('balanceSidebar');
+  if(!cont) return;
+  if(!WS.models.length){
+    cont.innerHTML = `<button class="sb-item" onclick="navTo('settings')"><span class="si">📦</span>模型余额<span class="sb-badge">0</span></button>`;
+    return;
+  }
+  cont.innerHTML = `<button class="sb-item" onclick="navTo('settings')"><span class="si">📦</span>模型余额<span class="sb-badge">${WS.models.length}</span></button>`;
+}
+
+function addFoundryEntry(text){
+  let body = T('foundryBody');
+  if(!body) return;
+  let entry = document.createElement('div');
+  entry.className = 'mf-entry';
+  entry.innerHTML = '<span class="mf-time">' + now() + '</span><span class="mf-text">' + E(text) + '</span>';
+  body.appendChild(entry);
+  if(body.children.length > 20) body.removeChild(body.firstChild);
+  body.scrollTop = body.scrollHeight;
+}
+
+function openBookStats(id){
+  let b = WS.books.find(x => x.id === id);
+  if(!b) return;
+  let chs = WS.chapters[id] || [];
+  let chars = WS.characters[id] || [];
+  let out = WS.outline[id];
+  let wc = chs.reduce((s,c) => s + (c.wordCount || 0), 0);
+  openSheet('📊 ' + E(b.title), `
+    <div class="stat3" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+      <div class="stat" style="background:var(--secondary);border-radius:var(--radius);padding:10px 6px;text-align:center">
+        <div style="font-size:.75rem;font-weight:700;color:var(--primary);font-family:var(--font-mono)">${chs.length}</div>
+        <div style="font-size:.34rem;color:var(--muted-foreground);margin-top:2px;font-family:var(--font-mono)">章节</div>
+      </div>
+      <div class="stat" style="background:var(--secondary);border-radius:var(--radius);padding:10px 6px;text-align:center">
+        <div style="font-size:.75rem;font-weight:700;color:var(--primary);font-family:var(--font-mono)">${wc.toLocaleString()}</div>
+        <div style="font-size:.34rem;color:var(--muted-foreground);margin-top:2px;font-family:var(--font-mono)">字数</div>
+      </div>
+      <div class="stat" style="background:var(--secondary);border-radius:var(--radius);padding:10px 6px;text-align:center">
+        <div style="font-size:.75rem;font-weight:700;color:var(--primary);font-family:var(--font-mono)">${chars.length}</div>
+        <div style="font-size:.34rem;color:var(--muted-foreground);margin-top:2px;font-family:var(--font-mono)">角色</div>
+      </div>
+    </div>
+    ${out ? '<div class="result">大纲已设定 · ' + E(out.length || out.slice ? out.slice(0,100) : '') + '</div>' : '<div class="empty" style="font-size:.36rem">尚未设定大纲</div>'}
+  `);
+}
+
+function openBookMenu(id){
+  let b = WS.books.find(x => x.id === id);
+  if(!b) return;
+  openSheet('菜单 · ' + E(b.title), `
+    <button class="btn full sm" style="margin-bottom:6px" onclick="closeSheet();navTo('chat')">💬 打开对话</button>
+    <button class="btn full sm" style="margin-bottom:6px" onclick="closeSheet();openBookStats('${id}')">📊 统计</button>
+    <button class="btn full sm dan" onclick="closeSheet();deleteBook('${id}')">🗑 删除</button>
+  `);
+}
+
+function selectBook(id){
+  WS.activeBookId = id;
+  wsSave();
+  renderBooksGrid();
+  renderSidebarBookshelf();
   chatRenderBookSel();
-}
-function chatRenderProvs(){
-  let sel=T('chatProv');if(!sel)return;
-  sel.innerHTML=(S.provs.length?S.provs.map(p=>`<option value="${p.id}" ${S.chatPid===p.id?'selected':''}>${E(p.name)} · ${E(p.model||'')}</option>`).join(''):'<option>暂无提供商</option>');
-  sel.onchange=()=>S.chatPid=sel.value;
-  if(!S.chatPid&&S.provs.length){S.chatPid=S.provs[0].id;sel.value=S.chatPid}
-}
-function chatRenderBookSel(){
-  let sel=T('chatBookSel');if(!sel)return;
-  sel.innerHTML='<option value="">选择书籍</option>'+WS.books.map(b=>`<option value="${b.id}" ${WS.activeBookId===b.id?'selected':''}>${E(b.title)}</option>`).join('');
-  if(!WS.activeBookId)sel.value='';
-  let lbl=T('chatBookLabel');
-  if(lbl){let b=WS.books.find(x=>x.id===WS.activeBookId);lbl.textContent=b?b.title:'未选择书籍'}
-}
-function chatSelectBook(id){
-  WS.activeBookId=id;wsSave();chatRenderBookSel();
-  let lbl=T('chatBookLabel');
-  if(lbl){let b=WS.books.find(x=>x.id===WS.activeBookId);lbl.textContent=b?b.title:'未选择书籍'}
 }
 
 function createBook(){
-  let title=prompt('📖 新书标题：');
-  if(!title||!title.trim())return;
-  let id='b_'+Date.now();WS.books.push({id,title:title.trim(),created:Date.now()});
-  WS.activeBookId=id;wsSave();renderBookshelf();chatRenderBookSel();toast('📖 新书《'+title.trim()+'》已创建','good');
-}
-function selectBook(id){WS.activeBookId=id;wsSave();renderBookshelf();chatRenderBookSel();}
-function deleteBook(id){
-  if(!confirm('确定删除这本书？'))return;
-  WS.books=WS.books.filter(b=>b.id!==id);
-  delete WS.chapters[id];delete WS.characters[id];delete WS.outline[id];delete WS.ledger[id];
-  if(WS.activeBookId===id)WS.activeBookId=WS.books.length?WS.books[0].id:'';
-  wsSave();renderBookshelf();chatRenderBookSel();toast('已删除','good');
+  let title = prompt('📖 新书标题：');
+  if(!title || !title.trim()) return;
+  let id = 'b_' + Date.now();
+  WS.books.push({id, title: title.trim(), created: Date.now(), genre: '小说'});
+  WS.activeBookId = id;
+  wsSave();
+  renderBooksGrid();
+  renderSidebarBookshelf();
+  chatRenderBookSel();
+  addFoundryEntry('📖 新书《' + title.trim() + '》已创建');
+  toast('📖 新书《' + title.trim() + '》已创建', 'good');
 }
 
-// Chat Functions
-function now(){return new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}
-function div(c,h){let d=document.createElement('div');d.className=c;if(h)d.innerHTML=h;return d}
+function deleteBook(id){
+  if(!confirm('确定删除这本书？')) return;
+  WS.books = WS.books.filter(b => b.id !== id);
+  delete WS.chapters[id];
+  delete WS.characters[id];
+  delete WS.outline[id];
+  delete WS.ledger[id];
+  if(WS.activeBookId === id) WS.activeBookId = WS.books.length ? WS.books[0].id : '';
+  wsSave();
+  renderBooksGrid();
+  renderSidebarBookshelf();
+  chatRenderBookSel();
+  toast('已删除', 'good');
+}
+
+// ── Chat ──
+function loadChat(){
+  chatRenderBookSel();
+  chatRenderModelPicker();
+  renderChatMessages();
+}
+
+function chatRenderBookSel(){
+  let sel = T('chatBookSel');
+  if(!sel) return;
+  sel.innerHTML = '<option value="">选择书籍</option>' +
+    WS.books.map(b => '<option value="' + b.id + '"' + (WS.activeBookId === b.id ? ' selected' : '') + '>' + E(b.title) + '</option>').join('');
+  if(!WS.activeBookId) sel.value = '';
+}
+
+function chatRenderModelPicker(){
+  let sel = T('chatModel');
+  if(!sel) return;
+  let models = WS.models.filter(m => m.model);
+  if(!models.length){
+    sel.innerHTML = '<option value="">暂无模型 (请先配置)</option>';
+    return;
+  }
+  sel.innerHTML = models.map(m => '<option value="' + m.id + '">' + E(m.name || m.model) + '</option>').join('');
+}
+
+function chatSelectBook(id){
+  WS.activeBookId = id;
+  wsSave();
+  chatRenderBookSel();
+  renderSidebarBookshelf();
+}
+
+function renderChatMessages(){
+  let body = T('chatBody');
+  let empty = T('chatEmpty');
+  if(!body) return;
+  // Remove old messages but keep empty state
+  let msgs = body.querySelectorAll('.msg');
+  msgs.forEach(m => m.remove());
+  if(!WS.writeMsgs.length){
+    if(empty) empty.style.display = 'flex';
+    return;
+  }
+  if(empty) empty.style.display = 'none';
+  WS.writeMsgs.forEach(m => {
+    let div = document.createElement('div');
+    div.className = 'msg ' + m.role;
+    let av = m.role === 'user' ? '👤' : '✦';
+    div.innerHTML = '<div class="m-av">' + av + '</div><div><div class="m-bub">' + E(m.content) + '</div><div class="m-time">' + (m.time ? new Date(m.time).toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'}) : '') + '</div></div>';
+    body.appendChild(div);
+  });
+  body.scrollTop = body.scrollHeight;
+}
 
 function quickWrite(type){
-  if(!WS.activeBookId){toast('请先选择或创建一本书','bad');return;}
-  let book=WS.books.find(b=>b.id===WS.activeBookId);if(!book)return;
-  let bid=WS.activeBookId,chs=WS.chapters[bid]||[],chars=WS.characters[bid]||[],lg=WS.ledger[bid]||{};
-  let endings=(lg.endings||[]).slice(-5).join(',')||'无';
-  let charStates=Object.entries(lg.charStates||{}).map(([k,v])=>k+':'+v).join('; ')||'无';
-  let foreshadowing=(lg.foreshadowing||[]).map(f=>f.name+'(@'+(f.recover||'?')+')').join(',')||'无';
-  let prompts={
-    continue:`📝 续写《${book.title}》——6步写作工作流。\n\n【状态读取】已完成${chs.length}章，已用结尾类型: ${endings}，角色状态: ${charStates}，待回收伏笔: ${foreshadowing}。\n\n【写作标准】\n- 字数2000-2500字，低于2000必须扩写\n- 开头200字内进入冲突/笑点/悬念\n- 对话占比≥50%，全用短句口语化\n- 章首禁用时间词（第二天/次日/翌日等），用"已完成的事"暗示时间流动\n- 章尾最后3句=强力钩子\n- 第一段从身体感受开始，不从认知开始\n- 句号占比≤30%，连续句号不超过3个\n- 段落长短交替（长100-200+中50-100+短10-50+极短1-10）\n- 环境描写覆盖≥3种感官\n- 一个场景内只允许一个视角\n\n【反水文】无"想了想""叹了口气""愣了一下"等废话；无同一信息说两遍；无否定式排比\n\n【连续性】章尾不闭环收尾；章首直接承接上章结尾（场景/动作/对话）；连续2章不用同一结尾类型。`,
-    golden3:`🏆 为《${book.title}》写黄金三章开头。\n\n【第一章】穿越/重生+系统激活+第一个打脸+结尾爽点预告\n- 300字内穿越交代→500字内系统激活→800字内第一次打脸\n- 字数2500-3000字\n\n【第二章】系统奖励+第二个打脸+众人震惊+结尾反转钩子\n- 承接第一章奖励→换场景换对手→让周围人震惊\n\n【第三章】展现实力+第三个打脸+全场轰动+结尾更大危机\n- 全面展示能力→第三个打脸全场轰动→所有人顶礼膜拜→结尾留更大危机\n\n目标：每章完读率≥85%，三章后留存≥70%。爽点密度高，节奏紧凑。`,
-    outline:`📋 为《${book.title}》规划完整大纲。\n\n${chs.length?'当前已有'+chs.length+'章。':''}请输出:\n- 卷级大纲：每卷核心冲突+情绪弧线+人物弧光+伏笔计划\n- 章级细纲：每章情节点+钩子类型(章首/章尾)+爽点密度\n- 世界观展开节奏\n- 角色出场计划\n\n按"大纲→卷纲→细纲"三层结构组织。`,
-    characters:`👤 为《${book.title}》设计角色体系。\n\n${chars.length?'当前角色：'+chars.map(c=>c.name).join('、')+'\n':''}请按五维骨架设计每个角色：\n- 外观特征+口头禅+惯用动作\n- 内在驱动+恐惧+秘密\n- 与其他角色的关系网\n- 跨卷成长弧线\n- 语言风格标签\n\n区分核心层(详细)和生态层(简略)。`,
-    anti_ai:`🔬 对以下内容执行去AI味处理——6大门禁+三刀流+8类必查。\n\n【六大门禁】\nGate A·禁用词替换：仿佛/好像/犹如/一丝/一抹/深吸一口气/缓缓/不禁/微微/眼中闪过/嘴角勾起/心中一动/不由得/突然/瞬间/自然而然→具体动作/细节描写\nGate B·句式去套路："XX说道"→动作替代(60%+无标签)；"……，带着……"万能状语→独立短句\nGate C·心理描写外化："他很紧张"→"他的手在抖"\nGate D·节奏打碎：打断连续排比句，长句拆短句，偶尔用不完整句\nGate E·对话去腔调：加"嗯""哦""靠""嘶"，角色可以答非所问，删解释性对话\nGate F·结尾去升华：删总结性语句，用动作/场景收尾\n\n【三刀流】第一刀斩逻辑链(删因为/所以/为了)；第二刀砍形容词(用生理反应替换)；第三刀拆长句(每段≤3行，每句≤15字)\n\n【8类必查】解释腔/作者报账/镜头脚本语言/先果后因/主语断裂/空泛情绪/模板化AI句式("不是X而是Y")/段尾金句病\n\n请先输出AI味检测报告(轻度/中度/重度+禁用词密度)，再输出改写结果。`,
-    quality:`✅ 对《${book.title}》最新章节执行三层质检。\n\n【第一层·字词级】错别字/漏字/多字/同音错字/形近错字\n【第二层·句段级】句式重复/词汇复现/"说三缺一"/指代断裂/时序跳跃/场景突变/章节衔接检查\n【第三层·篇章级】人名地名一致性/设定一致性/伏笔登记/章末钩子/节奏疲软点/连续性验证：章首是否有时间词？章尾钩子是否丢失？承接是否连贯？\n\n${charStates?'当前角色状态：'+charStates+'\n':''}${endings?'已用结尾类型：'+endings+'\n':''}${foreshadowing?'待回收伏笔：'+foreshadowing+'\n':''}\n\n请输出质检报告：问题分级(S1-S4)，每项标注位置和建议修改方案。`,
-    new_chapter:`为《${book.title}》写第${chs.length+1}章。\n\n${chars.length?'角色：'+chars.map(c=>c.name).join('、')+'\n':''}${endings?'上章结尾类型：'+endings.split(',').pop()+'（避免重复）\n':''}${charStates?'角色状态：'+charStates+'\n':''}\n\n【写作标准】字数2000-2500字，开头200字进入冲突，对话≥50%，全短句口语化，无比喻排比拟人。章首禁用时间词，章尾强钩子。第一段从身体感受开始。`,
-    save:`💾 总结《${book.title}》写作进度。\n已完成${chs.length}章，合计${chs.reduce((s,c)=>s+(c.wordCount||0),0)}字。\n${charStates?'当前角色状态：'+charStates+'\n':''}${foreshadowing?'待回收伏笔：'+foreshadowing+'\n':''}\n请输出：\n1. 剧情进度总结（2-3句）\n2. 下一个5章规划方向\n3. 需要调整的写作策略建议`
+  if(!WS.activeBookId){
+    toast('请先选择或创建一本书', 'bad');
+    return;
+  }
+  let book = WS.books.find(b => b.id === WS.activeBookId);
+  if(!book) return;
+  let bid = WS.activeBookId;
+  let chs = WS.chapters[bid] || [];
+  let chars = WS.characters[bid] || [];
+  let lg = WS.ledger[bid] || {};
+  let endings = (lg.endings || []).slice(-5).join(',') || '无';
+  let charStates = Object.entries(lg.charStates || {}).map(([k,v]) => k+':'+v).join('; ') || '无';
+  let foreshadowing = (lg.foreshadowing || []).map(f => f.name + '(@' + (f.recover || '?') + ')').join(',') || '无';
+
+  let prompts = {
+    continue: '📝 续写《' + book.title + '》——6步写作工作流。\n\n【状态读取】已完成' + chs.length + '章，已用结尾类型: ' + endings + '，角色状态: ' + charStates + '，待回收伏笔: ' + foreshadowing + '。\n\n【写作标准】\n- 字数2000-2500字，低于2000必须扩写\n- 开头200字内进入冲突/笑点/悬念\n- 对话占比≥50%，全用短句口语化\n- 章首禁用时间词（第二天/次日/翌日等），用"已完成的事"暗示时间流动\n- 章尾最后3句=强力钩子\n- 第一段从身体感受开始，不从认知开始\n- 句号占比≤30%，连续句号不超过3个\n- 段落长短交替（长100-200+中50-100+短10-50+极短1-10）\n- 环境描写覆盖≥3种感官\n- 一个场景内只允许一个视角\n\n【反水文】无"想了想""叹了口气""愣了一下"等废话；无同一信息说两遍；无否定式排比\n\n【连续性】章尾不闭环收尾；章首直接承接上章结尾（场景/动作/对话）；连续2章不用同一结尾类型。',
+    novel: '📖 开始创作一部长篇小说《' + book.title + '》。请先输出完整的大纲框架：核心主题、世界观设定、主要角色、三幕式结构。然后开始写第一章。',
+    short: '📜 为《' + book.title + '》创作一篇短篇小说。字数3000-5000字。要求：开头即入题，人物鲜明，结尾有余韵。',
+    fanfic: '✒️ 为《' + book.title + '》进行同人创作。基于原作世界观和角色，展开原创故事。请先确认你理解原作设定，然后输出故事。',
+    side: '📑 为《' + book.title + '》创作番外故事。番外可以聚焦于配角、IF线、或时间线之外的片段。请输出完整番外。',
+    imitate: '🪄 仿写创作。请分析一段参考文本的风格特征（词汇、句式、节奏、语调），然后用相同风格为《' + book.title + '》创作一段内容。',
+    branch: '🔀 分支互动创作。为《' + book.title + '》设计一个分支互动情节节点。每个选择点提供2-3个选项，不同选项导向不同剧情发展。',
+    openworld: '🎮 开放世界创作。为《' + book.title + '》设计一个开放世界设定：世界观地理、势力分布、种族/文化、关键地点、隐藏秘密。然后从主角视角开始一段探索叙事。',
+    audit: '🔍 对《' + book.title + '》最新章节执行全面审计。分析：情节连贯性、角色一致性、节奏把控、对话质量、描写密度。输出审计报告和改进建议。',
+    export: '📄 导出《' + book.title + '》的完整写作数据。包括：全书章节总览、角色表、大纲结构、写作统计。请以Markdown格式输出。',
+    radar: '📈 市场雷达分析。分析《' + book.title + '》在当前网文市场的定位：题材热度、竞争分析、差异化建议、目标读者画像、推荐榜单策略。'
   };
-  let text=prompts[type]||type;
-  switchTab(1);
-  setTimeout(()=>{
-    T('chatInput').value=text;
-    if(T('chatInput'))T('chatInput').focus();
-    sendWriteChat();
-  },100);
+
+  let text = prompts[type] || type;
+  navTo('chat');
+  setTimeout(() => {
+    let inp = T('chatInput');
+    if(inp){
+      inp.value = text;
+      inp.focus();
+      sendChat();
+    }
+  }, 150);
 }
 
-async function sendWriteChat(){
-  let inp=T('chatInput'),text=inp.value.trim();
-  if(!text||!S.chatPid){if(!S.chatPid)toast('请先选择提供商','bad');return;}
-  inp.value='';inp.style.height='auto';
-  let body=T('chatBody'),empty=T('chatEmpty');
-  if(empty)empty.style.display='none';
-  let um=div('msg user',`<div class="m-av">👤</div><div><div class="m-bub">${E(text)}</div><div class="m-time">${now()}</div></div>`);
+async function sendChat(){
+  let inp = T('chatInput');
+  let text = inp.value.trim();
+  if(!text) return;
+  inp.value = '';
+  inp.style.height = 'auto';
+
+  let body = T('chatBody');
+  let empty = T('chatEmpty');
+  if(empty) empty.style.display = 'none';
+
+  // Add user message
+  let um = document.createElement('div');
+  um.className = 'msg user';
+  um.innerHTML = '<div class="m-av">👤</div><div><div class="m-bub">' + E(text) + '</div><div class="m-time">' + now() + '</div></div>';
   body.appendChild(um);
-  WS.writeMsgs=WS.writeMsgs||[];WS.writeMsgs.push({role:'user',content:text,time:Date.now()});
-  if(WS.writeMsgs.length>100)WS.writeMsgs=WS.writeMsgs.slice(-100);
-  let ty=div('msg assistant','<div class="m-av">✦</div><div class="m-bub"><div class="typing-dots"><span></span><span></span><span></span></div></div>');
-  ty.id='typingInd';body.appendChild(ty);body.scrollTop=body.scrollHeight;
-  T('sendBtn').disabled=true;
+
+  WS.writeMsgs = WS.writeMsgs || [];
+  WS.writeMsgs.push({role:'user', content:text, time:Date.now()});
+  if(WS.writeMsgs.length > 100) WS.writeMsgs = WS.writeMsgs.slice(-100);
+
+  // Typing indicator
+  let ty = document.createElement('div');
+  ty.className = 'msg assistant';
+  ty.id = 'typingInd';
+  ty.innerHTML = '<div class="m-av">✦</div><div class="m-bub"><div class="typing-indicator"><span></span><span></span><span></span></div></div>';
+  body.appendChild(ty);
+  body.scrollTop = body.scrollHeight;
+
+  T('sendBtn').disabled = true;
+
   try{
-    let msgs=WS.writeMsgs.slice(-10).map(m=>({role:m.role,content:m.content}));
-    let book=WS.books.find(b=>b.id===WS.activeBookId);
-    let ctx=book?'[写作上下文: 《'+book.title+'》] ':'';
-    let resp=await api('/api/chat',{method:'POST',body:JSON.stringify({messages:[{role:'system',content:ctx+'你是一位专业小说写作助手，帮助作者创作。请保持自然的文风。'}].concat(msgs),provider_id:S.chatPid})});
+    let modelSel = T('chatModel');
+    let providerId = modelSel ? modelSel.value : '';
+    let msgs = WS.writeMsgs.slice(-10).map(m => ({role:m.role, content:m.content}));
+    let book = WS.books.find(b => b.id === WS.activeBookId);
+    let ctx = book ? '[写作上下文: 《' + book.title + '》] ' : '';
+
+    let resp;
+    if(providerId){
+      resp = await api('/api/chat', {
+        method:'POST',
+        body: JSON.stringify({
+          messages: [{role:'system', content: ctx + '你是一位专业小说写作助手，帮助作者创作。请保持自然的文风。'}].concat(msgs),
+          provider_id: providerId
+        })
+      });
+    } else {
+      // Fallback: use first available model
+      let models = WS.models.filter(m => m.model);
+      if(models.length){
+        resp = await api('/api/chat', {
+          method:'POST',
+          body: JSON.stringify({
+            messages: [{role:'system', content: ctx + '你是一位专业小说写作助手。'}].concat(msgs),
+            provider_id: models[0].id
+          })
+        });
+      } else {
+        throw new Error('请先在设置中配置模型');
+      }
+    }
+
     ty.remove();
-    let am=div('msg assistant',`<div class="m-av">✦</div><div><div class="m-bub">${E(resp.content)}</div><div class="m-time">${now()}</div></div>`);
-    body.appendChild(am);WS.writeMsgs.push({role:'assistant',content:resp.content,time:Date.now()});
-    if(resp.tokens)updateStatus(resp.tokens);
-    // Auto-save chapter if content is long
-    if(WS.activeBookId&&resp.content.length>200&&!text.startsWith('📋')&&!text.startsWith('👤')&&!text.startsWith('🏆')&&!text.startsWith('🔬')&&!text.startsWith('✅')&&!text.startsWith('💾')){
+    let am = document.createElement('div');
+    am.className = 'msg assistant';
+    am.innerHTML = '<div class="m-av">✦</div><div><div class="m-bub">' + E(resp.content) + '</div><div class="m-time">' + now() + '</div></div>';
+    body.appendChild(am);
+    WS.writeMsgs.push({role:'assistant', content:resp.content, time:Date.now()});
+
+    // Auto-save chapter if content is substantial
+    if(WS.activeBookId && resp.content.length > 200 &&
+       !text.startsWith('📋') && !text.startsWith('👤') && !text.startsWith('🏆') &&
+       !text.startsWith('🔬') && !text.startsWith('✅') && !text.startsWith('💾') &&
+       !text.startsWith('📈') && !text.startsWith('🔍') && !text.startsWith('📄')){
       autoSaveChapter(resp.content);
     }
-    renderRecentSessions();
-  }catch(e){ty.remove();let em=div('msg assistant',`<div class="m-av">✦</div><div><div class="m-bub">❌ ${E(e.message)}</div></div>`);body.appendChild(em)}
-  T('sendBtn').disabled=false;body.scrollTop=body.scrollHeight;
+    renderSidebarHistory();
+    addFoundryEntry('✦ AI回复 · ' + (resp.content.length) + '字');
+
+  }catch(e){
+    ty.remove();
+    let em = document.createElement('div');
+    em.className = 'msg assistant';
+    em.innerHTML = '<div class="m-av">✦</div><div><div class="m-bub">❌ ' + E(e.message) + '</div></div>';
+    body.appendChild(em);
+  }
+
+  T('sendBtn').disabled = false;
+  body.scrollTop = body.scrollHeight;
 }
 
 function autoSaveChapter(content){
-  let bid=WS.activeBookId;if(!bid)return;
-  let chs=WS.chapters[bid]=WS.chapters[bid]||[];
-  if(!chs.length||chs[chs.length-1].content){
-    chs.push({title:'自动保存 '+(chs.length+1),content:content,wordCount:content.replace(/\s/g,'').length,created:Date.now()});
+  let bid = WS.activeBookId;
+  if(!bid) return;
+  let chs = WS.chapters[bid] = WS.chapters[bid] || [];
+  if(!chs.length || chs[chs.length-1].content){
+    chs.push({title:'自动保存 ' + (chs.length+1), content:content, wordCount:content.replace(/\s/g,'').length, created:Date.now()});
   }else{
-    chs[chs.length-1].content=(chs[chs.length-1].content||'')+'\n\n'+content;
-    chs[chs.length-1].wordCount=chs[chs.length-1].content.replace(/\s/g,'').length;
+    chs[chs.length-1].content = (chs[chs.length-1].content || '') + '\n\n' + content;
+    chs[chs.length-1].wordCount = chs[chs.length-1].content.replace(/\s/g,'').length;
   }
-  if(chs.length>1&&chs[0].title==='自动保存 1'&&chs[0].autoTitle){} // no-op
-  wsSave();renderBookshelf();
+  wsSave();
+  renderBooksGrid();
+  renderSidebarBookshelf();
 }
 
-// ── ═══ Writing State (localStorage) ═══ ──
-const WS={books:[],activeBookId:'',chapters:{},characters:{},outline:{},ledger:{},writeMsgs:[]};
-(function wsLoad(){try{let d=localStorage.getItem('inkos_ws_data');if(d){let p=JSON.parse(d);WS.books=p.books||[];WS.activeBookId=p.activeBookId||'';WS.chapters=p.chapters||{};WS.characters=p.characters||{};WS.outline=p.outline||{};WS.ledger=p.ledger||{};WS.writeMsgs=p.writeMsgs||[];}}catch(e){}})();
-(function wsMigrate(){try{let d=localStorage.getItem('ws_data');if(d&&!localStorage.getItem('inkos_ws_data')){let p=JSON.parse(d);p.writeMsgs=[];localStorage.setItem('inkos_ws_data',JSON.stringify(p));WS.books=p.books||[];WS.activeBookId=p.activeBookId||'';WS.chapters=p.chapters||{};WS.characters=p.characters||{};WS.outline=p.outline||{};WS.ledger=p.ledger||{};}}catch(e){}})();
-function wsSave(){try{localStorage.setItem('inkos_ws_data',JSON.stringify({books:WS.books,activeBookId:WS.activeBookId,chapters:WS.chapters,characters:WS.characters,outline:WS.outline,ledger:WS.ledger,writeMsgs:WS.writeMsgs}))}catch(e){}}
-
-// ── ═══ Models Tab ═══ ──
-async function loadModels(){
-  try{
-    S.provs=(await api('/api/providers')).providers||[];
-    T('modelProvCount').textContent=S.provs.length;
-    let html=S.provs.length?S.provs.map(p=>{
-      let m=p.cached_models||[];
-      return `<div class="pcard${S.selPid===p.id?' sel':''}" onclick="${isDesktop()?'loadDetailM(\"'+p.id+'\")':'switchTab(0);openProvSheet(\"'+p.id+'\")'}">
-        <div class="pr"><div class="pav">🔌</div><div class="pi"><div class="pn">${E(p.name)}</div><div class="pu">${E(p.base_url)}</div></div>
-        <span class="badge ${p.model_count?'ok':'info'}">${p.model_count||0}</span><span class="chev">›</span></div>
-        ${m.length?`<div class="model-tags">${m.slice(0,12).map(mm=>`<span>${E((mm.id.split('/').pop()||mm.id).slice(0,20))}</span>`).join('')}${m.length>12?`<span>+${m.length-12}</span>`:''}</div>`:''}
-      </div>`;
-    }).join(''):'<div class="empty">暂无提供商 — 点击下方按钮添加</div>';
-    T('modelList').innerHTML=html;
-    if(isDesktop()&&S.selPid)loadDetailM(S.selPid);
-  }catch(e){}
-}
-async function loadDetailM(pid){S.selPid=pid;let panel=T('modelDetail');if(!panel)return;await loadDetail(pid);
-  document.querySelectorAll('#modelList .pcard').forEach(c=>c.classList.remove('sel'));
-}
-
-// ── ═══ Desktop Detail Panel ═══ ──
-async function loadDetail(pid){
-  S.selPid=pid;
-  let p=S.provs.find(x=>x.id===pid);if(!p)return;
-  let ms=(p.cached_models||[]).slice(0,60);
-  let panel=T('modelDetail');
-  if(!panel)return;
-  panel.innerHTML=`<div class="dp-head"><h3>${E(p.name)}</h3><button class="btn sm" onclick="sheetAdd()">编辑</button></div>
-    <div class="dp-meta">${E(p.base_url)} · ${E(p.model||'未设置')}</div>
-    <div class="dp-actions">
-      <button class="btn pri sm" id="btnTestD" onclick="testProvDesk('${pid}')">🔍 测试连接</button>
-      <button class="btn sm" onclick="checkBalDesk('${pid}')">💰 查余额</button>
-      <button class="btn dan sm" onclick="delProv('${pid}')">🗑</button>
-    </div>
-    <div id="provResD" style="padding:0 20px"></div>
-    <div class="dash-sec-h" style="margin:14px 20px 6px"><span class="dsh-ic">📋</span><span class="dsh-t">模型列表</span><span class="dsh-c">${ms.length}个</span></div>
-    <div class="mlist">${ms.length?ms.map(m=>`<div class="mitem"><span class="mid">${E(m.id)}</span><span class="mby">${E(m.owned_by)}</span></div>`).join(''):'<div class="empty">点击"测试连接"获取模型列表</div>'}</div>`;
-  document.querySelectorAll('#modelList .pcard,#dashList .pcard').forEach(c=>c.classList.remove('sel'));
-}
-async function testProvDesk(pid){
-  let res=T('provResD');res.innerHTML='<div class="pulse" style="text-align:center;padding:8px;color:var(--t3);font-family:var(--font-mono)">测试中...</div>';
-  try{
-    let r=await api('/api/providers/'+pid+'/test',{method:'POST'});
-    if(r.connected){res.innerHTML=`<div class="result ok">✓ 连接成功 · ${r.model_count}个模型</div>`;toast('连接成功','good');
-      loadDash();setTimeout(()=>loadDetail(pid),300);
-    }else{res.innerHTML=`<div class="result err">✗ ${E(r.error||'')}\n${E(r.detail||'')}</div>`;toast('连接失败','bad')}
-  }catch(e){res.innerHTML=`<div class="result err">✗ ${E(e.message)}</div>`}
-}
-async function checkBalDesk(pid){
-  let res=T('provResD');res.innerHTML='<div class="pulse" style="text-align:center;padding:8px;color:var(--t3);font-family:var(--font-mono)">查询中...</div>';
-  try{
-    let r=await api('/api/providers/'+pid+'/balance',{method:'POST'});
-    if(r.source==='billing_api'){res.innerHTML=`<div class="result ok">💰 硬上限: $${r.hard_limit_usd||0} · 软上限: $${r.soft_limit_usd||0} · 到期: ${r.access_until||'?'}</div>`;toast('余额已获取','good')}
-    else if(r.source==='test_call'&&r.credits_available){res.innerHTML=`<div class="result ok">💰 额度可用 ✓</div>`;toast('正常','good')}
-    else{res.innerHTML=`<div class="result">ℹ 该提供商不支持余额查询 (${r.source})</div>`}
-  }catch(e){res.innerHTML=`<div class="result err">查询失败: ${E(e.message)}</div>`}
-}
-
-// ── ═══ Provider Sheet (mobile) ═══ ──
-async function openProvSheet(pid){
-  let p=S.provs.find(x=>x.id===pid);if(!p)return;
-  let ms=(p.cached_models||[]).slice(0,40);
-  openSheet(E(p.name),`
-    <div style="font-size:.45rem;color:var(--t2);font-family:var(--font-mono);margin-bottom:8px">${E(p.base_url)}</div>
-    <div class="fg"><label>默认模型</label><div style="font-size:.48rem;color:var(--t1);font-family:var(--font-mono)">${E(p.model||'未设置')}</div></div>
-    <div style="display:flex;gap:6px;margin-bottom:10px">
-      <button class="btn pri sm" style="flex:1" id="btnTest" onclick="testProvSheet('${pid}')">🔍 测试连接</button>
-      <button class="btn sm" style="flex:1" onclick="checkBalSheet('${pid}')">💰 查余额</button>
-    </div>
-    <div id="sheetRes"></div>
-    <div class="dash-sec-h"><span class="dsh-ic">📋</span><span class="dsh-t">模型列表</span><span class="dsh-c">${ms.length}个</span></div>
-    <div class="mlist">${ms.length?ms.map(m=>`<div class="mitem"><span class="mid">${E(m.id)}</span><span class="mby">${E(m.owned_by)}</span></div>`).join(''):'<div class="empty">点击"测试连接"获取</div>'}</div>
-    <button class="btn dan full" style="margin-top:10px" onclick="delProv('${pid}')">🗑 删除</button>
-  `);
-}
-async function testProvSheet(pid){let r=T('sheetRes');r.innerHTML='<div class="pulse" style="text-align:center;padding:8px;color:var(--t3);font-family:var(--font-mono)">测试中...</div>';
-  try{let d=await api('/api/providers/'+pid+'/test',{method:'POST'});
-    if(d.connected){r.innerHTML=`<div class="result ok">✓ 连接成功 · ${d.model_count}个模型</div>`;toast('成功','good');closeSheet();loadDash();setTimeout(()=>openProvSheet(pid),300)}
-    else{r.innerHTML=`<div class="result err">✗ ${E(d.error||'')}</div>`;toast('失败','bad')}
-  }catch(e){r.innerHTML=`<div class="result err">${E(e.message)}</div>`}
-}
-async function checkBalSheet(pid){let r=T('sheetRes');r.innerHTML='<div class="pulse" style="text-align:center;padding:8px;color:var(--t3);font-family:var(--font-mono)">查询中...</div>';
-  try{let d=await api('/api/providers/'+pid+'/balance',{method:'POST'});
-    if(d.source==='billing_api')r.innerHTML=`<div class="result ok">💰 硬上限: $${d.hard_limit_usd||0} · 到期: ${d.access_until||'?'}</div>`;
-    else if(d.source==='test_call')r.innerHTML=`<div class="result ok">💰 额度可用 ✓</div>`;
-    else r.innerHTML=`<div class="result">ℹ 不支持余额查询</div>`;
-  }catch(e){r.innerHTML=`<div class="result err">${E(e.message)}</div>`}
-}
-
-// ── ═══ Settings ═══ ──
+// ── Settings ──
 async function loadSettings(){
   try{
-    let[p,tk]=await Promise.all([api('/api/providers'),api('/api/tokens')]);S.provs=p.providers||[];
-    T('setProvs').innerHTML=S.provs.length?S.provs.map(p=>`<div class="pcard" style="cursor:default">
-      <div class="pr"><div class="pav">🔌</div><div class="pi"><div class="pn">${E(p.name)}</div><div class="pu">${E(p.model||'未设置')} · ${E(p.base_url)}</div></div></div>
-      <div style="display:flex;gap:6px;margin-top:6px;padding-top:6px;border-top:1px solid var(--bd)"><button class="btn sm pri" onclick="isDesktop()?loadDetail('${p.id}'):openProvSheet('${p.id}')">详情</button>
-      <button class="btn sm dan" onclick="delProv('${p.id}')">删除</button></div></div>`).join(''):'<div class="empty">暂无</div>';
-    T('tokInfo').innerHTML=`<div class="stat3" style="padding:0"><div class="stat"><div class="sv">${tk.total_requests||0}</div><div class="sl">请求</div></div><div class="stat"><div class="sv">${tk.total_tokens||0}</div><div class="sl">Token</div></div><div class="stat"><div class="sv">${tk.total_tests||0}</div><div class="sl">测试</div></div></div>`;
-  }catch(e){}
+    let p = await api('/api/providers').catch(() => ({providers:[]}));
+    WS.models = (p.providers || []).filter(x => x.model);
+    renderBalanceGrid();
+    T('balanceCount').textContent = WS.models.length + ' 个模型';
+    renderBalanceSidebar();
+  }catch(e){
+    T('balanceCount').textContent = '获取失败';
+  }
 }
-async function delProv(pid){if(!confirm('删除？'))return;
-  try{await api('/api/providers/'+pid,{method:'DELETE'});S.selPid='';closeSheet();loadDash();loadModels();loadSettings();toast('已删除','good')}catch(e){toast(e.message,'bad')}
+
+function renderBalanceGrid(){
+  let grid = T('balanceGrid');
+  if(!grid) return;
+  if(!WS.models.length){
+    grid.innerHTML = '<div class="empty" style="font-size:.4rem">暂无已配置的模型。请在服务商配置 API 后刷新。</div>';
+    return;
+  }
+  grid.innerHTML = WS.models.map(m => {
+    let usage = '';
+    if(m.total_tokens !== undefined) usage = '<div class="bc-usage"><span>Tokens: <span class="bc-val">' + m.total_tokens.toLocaleString() + '</span></span></div>';
+    else if(m.total_requests !== undefined) usage = '<div class="bc-usage"><span>请求: <span class="bc-val">' + m.total_requests + '</span></span></div>';
+    else usage = '<div class="bc-usage"><span>状态: <span class="bc-val">已配置</span></span></div>';
+    return '<div class="balance-card">' +
+      '<div class="bc-name"><span class="bc-ic">📦</span>' + E(m.name || m.model || '未命名') + '</div>' +
+      '<div class="bc-url">' + E(m.base_url || '') + '</div>' +
+      usage +
+      '</div>';
+  }).join('');
 }
-function sheetAdd(){
-  openSheet('添加提供商',`<div class="fg"><label>名称</label><input class="inp" id="spName" placeholder="DeepSeek / OpenAI"></div>
-    <div class="fg"><label>API 地址</label><input class="inp" id="spUrl" placeholder="https://api.openai.com/v1" value="https://api.openai.com/v1"></div>
-    <div class="fg"><label>API Key</label><input class="inp" id="spKey" type="password" placeholder="sk-..."></div>
-    <div class="fg"><label>默认模型</label><input class="inp" id="spModel" placeholder="gpt-4o"></div>
-    <button class="btn pri full" onclick="addProv()">添加</button>`);
-}
-async function addProv(){
-  try{await api('/api/providers',{method:'POST',body:JSON.stringify({name:T('spName').value,base_url:T('spUrl').value,api_key:T('spKey').value,model:T('spModel').value})});
-    closeSheet();loadDash();loadModels();loadSettings();toast('已添加','good')}catch(e){toast(e.message,'bad')}
-}
-async function resetTok(){if(!confirm('确定？'))return;await api('/api/tokens/reset',{method:'POST'});loadSettings();toast('已重置','good')}
 
 // ── Init ──
-loadDash();
-if('serviceWorker' in navigator){navigator.serviceWorker.register('/static/sw.js').catch(()=>{});}
+(function init(){
+  // Handle initial route
+  let hash = window.location.hash.replace('#', '') || 'dashboard';
+  if(!ROUTES[hash] && hash !== '') hash = 'dashboard';
+  window.location.hash = hash;
+  handleRoute();
+
+  // Register service worker
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('/static/sw.js').catch(() => {});
+  }
+
+  // Window resize handler for desktop detection
+  window.addEventListener('resize', () => {
+    if(isDesktop()){
+      T('overlay')?.classList.remove('show');
+      T('sheet')?.classList.remove('show');
+    }
+  });
+})();
 </script>
 </body>
 </html>
