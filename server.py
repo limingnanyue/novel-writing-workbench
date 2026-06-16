@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""InkOS Studio v6.0 — AI Writing Workbench + Model Balance"""
-import sys, os, json, datetime, uuid, shutil
+"""NOVEL Studio v7.0 — AI Writing Workbench + Model Manager"""
+import sys, os, json, datetime, uuid, shutil, urllib.request
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, StreamingResponse
@@ -8,23 +8,19 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import asyncio
-import urllib.request
 
 HOST = os.environ.get("HOST", "0.0.0.0")
 PORT = int(os.environ.get("PORT", "8080"))
 DATA_DIR = Path(os.environ.get("DATA_DIR", str(Path(__file__).parent / "data")))
 
-app = FastAPI(title="InkOS Studio", version="6.6.0")
+app = FastAPI(title="NOVEL Studio", version="7.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 BASE_DIR = Path(__file__).parent
 STATIC_DIR = BASE_DIR / "static"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-# ═══════════════════════════════════════
-# Data helpers
-# ═══════════════════════════════════════
-
+# ── Data helpers ──
 def _load_json(path, default=None):
     try:
         return json.loads(path.read_text(encoding="utf-8")) if path.exists() else (default or {})
@@ -35,16 +31,18 @@ def _save_json(path, data):
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 # ═══════════════════════════════════════
-# Model Balance (configurable)
+# Model / Provider Management
 # ═══════════════════════════════════════
-
 BALANCE_FILE = DATA_DIR / "models.json"
 
 @app.get("/api/models")
 def list_models():
+    """List all models. API keys are masked in response."""
     data = _load_json(BALANCE_FILE, {"models": []})
     for m in data.get("models", []):
-        m["has_key"] = bool(m.pop("api_key", ""))
+        key = m.get("api_key", "")
+        m["has_key"] = bool(key)
+        m["api_key"] = key[:6] + "..." + key[-4:] if len(key) > 12 else ("•••••" if key else "")
     return data
 
 class ModelInput(BaseModel):
@@ -70,20 +68,34 @@ def add_model(req: ModelInput):
         "expires": req.expires,
         "created": datetime.datetime.now().isoformat()
     }
+    # Update existing by name
     for i, m in enumerate(data.get("models", [])):
         if m.get("name") == req.name:
             entry["id"] = m.get("id", entry["id"])
+            # Preserve existing key if new one is empty
+            if not req.api_key and m.get("api_key"):
+                entry["api_key"] = m["api_key"]
             data["models"][i] = entry
             _save_json(BALANCE_FILE, data)
-            # Strip api_key from response
             resp = {k: v for k, v in entry.items() if k != "api_key"}
             resp["has_key"] = bool(entry.get("api_key"))
             return {"model": resp, "updated": True}
     data.setdefault("models", []).append(entry)
     _save_json(BALANCE_FILE, data)
-    resp = {k: v for k, v in entry.items() if k != "api_key"}
-    resp["has_key"] = bool(entry.get("api_key"))
-    return {"model": resp, "created": True}
+    res = {k: v for k, v in entry.items() if k != "api_key"}
+    res["has_key"] = bool(entry.get("api_key"))
+    return {"model": res, "created": True}
+
+@app.get("/api/models/{model_id}")
+def get_model(model_id: str):
+    data = _load_json(BALANCE_FILE, {"models": []})
+    for m in data.get("models", []):
+        if m.get("id") == model_id:
+            key = m.get("api_key", "")
+            m["has_key"] = bool(key)
+            m["api_key"] = key[:6] + "..." + key[-4:] if len(key) > 12 else ("•••••" if key else "")
+            return m
+    raise HTTPException(404, "Model not found")
 
 @app.delete("/api/models/{model_id}")
 def delete_model(model_id: str):
@@ -91,6 +103,38 @@ def delete_model(model_id: str):
     data["models"] = [m for m in data.get("models", []) if m.get("id") != model_id]
     _save_json(BALANCE_FILE, data)
     return {"deleted": True}
+
+@app.post("/api/models/{model_id}/test")
+def test_model_connection(model_id: str):
+    """Test connection to a model endpoint. Returns available models."""
+    data = _load_json(BALANCE_FILE, {"models": []})
+    provider = None
+    for m in data.get("models", []):
+        if m.get("id") == model_id:
+            provider = m
+            break
+    if not provider:
+        raise HTTPException(404, "Model not found")
+    
+    url = (provider.get("base_url", "").rstrip("/") + "/models")
+    req_http = urllib.request.Request(url, headers={
+        "Authorization": f"Bearer {provider.get('api_key', '')}",
+        "User-Agent": "NOVEL-Studio/7.0"
+    })
+    try:
+        with urllib.request.urlopen(req_http, timeout=15) as resp:
+            body = json.loads(resp.read())
+            models_raw = body.get("data", []) if isinstance(body, dict) else body
+            models_found = []
+            for m in models_raw:
+                mid = m.get("id", "") if isinstance(m, dict) else m
+                if mid:
+                    models_found.append({"id": mid, "name": m.get("name", mid) if isinstance(m, dict) else mid})
+            return {"success": True, "models": models_found, "count": len(models_found)}
+    except urllib.error.HTTPError as e:
+        return {"success": False, "error": f"HTTP {e.code}", "detail": e.read().decode()[:300]}
+    except Exception as e:
+        return {"success": False, "error": str(e)[:300]}
 
 # ═══════════════════════════════════════
 # AI Chat (for writing prompts)
@@ -115,7 +159,7 @@ def write_chat(req: ChatInput):
     if not provider:
         provider = next(iter(m.get("models", [])), None) if models_data.get("models") else None
     if not provider:
-        return {"role": "assistant", "content": "⚠️ 未配置模型。请先在设置中添加模型（名称、API地址、Key、模型ID）。", "tokens": 0, "error": "no_model"}
+        return {"role": "assistant", "content": "⚠️ 未配置模型。请先在模型管理中添加上模型。", "tokens": 0, "error": "no_model"}
     
     url = (provider.get("base_url", "").rstrip("/") + "/chat/completions")
     body = json.dumps({
@@ -133,7 +177,6 @@ def write_chat(req: ChatInput):
             data = json.loads(resp.read())
             content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
             tokens = estimate_tokens(content)
-            # Update usage
             m = provider
             m["used_credits"] = m.get("used_credits", 0) + tokens
             _save_json(BALANCE_FILE, models_data)
@@ -161,7 +204,7 @@ async def write_chat_stream(req: ChatInput):
     
     async def event_stream():
         if not provider:
-            yield f"data: {json.dumps({'type':'error','content':'⚠️ 未配置模型。请先在设置中添加模型。'})}\n\n"
+            yield f"data: {json.dumps({'type':'error','content':'⚠️ 未配置模型。请先在模型管理中添加模型。'})}\n\n"
             yield "data: [DONE]\n\n"
             return
         
@@ -202,12 +245,9 @@ async def write_chat_stream(req: ChatInput):
                                 token_count += 1
                                 yield f"data: {json.dumps({'type':'token','content':content,'tokens':token_count})}\n\n"
                                 await asyncio.sleep(0)
-                            # Check if finish_reason is set
                             finish = chunk.get('choices', [{}])[0].get('finish_reason')
                             if finish:
-                                # Estimate total tokens
                                 total = estimate_tokens(full_content)
-                                # Update usage
                                 m = provider
                                 m["used_credits"] = m.get("used_credits", 0) + total
                                 _save_json(BALANCE_FILE, models_data)
@@ -231,7 +271,6 @@ async def write_chat_stream(req: ChatInput):
 
 # ═══════════════════════════════════════
 # Writing / Book Management
-
 # ═══════════════════════════════════════
 
 WRITING_DIR = DATA_DIR / "writing"
@@ -389,7 +428,7 @@ app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 if __name__ == "__main__":
     import uvicorn
-    print(f"\n  ✦ InkOS Studio v6.0")
+    print(f"\n  ✦ NOVEL Studio v7.0")
     print(f"  ✦ http://{HOST}:{PORT}")
     print(f"  ✦ Data: {DATA_DIR}\n")
     uvicorn.run(app, host=HOST, port=PORT, log_level="warning")

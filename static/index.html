@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <meta name="theme-color" content="#faf6f0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>InkOS Studio v6.6</title>
+<title>NOVEL Studio v7.0</title>
 <style>
 /* ═══════════════════════════════════════════
-   InkOS Design System — Pure AI Writing Workbench
+   NOVEL Design System — AI Writing Workbench
    ═══════════════════════════════════════════ */
 
 /* ── Light (default) ── */
@@ -596,6 +596,75 @@ a{color:var(--primary);text-decoration:none}
 }
 .set-about .about-logo{margin-bottom:8px}
 
+/* ═══ Model Cards (InkOS-style) ═══ */
+.mdl-grid{display:flex;flex-direction:column;gap:8px}
+.mdl-card{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 14px;
+  border-radius:calc(var(--radius) + 0.1rem);
+  border:1px solid var(--border);
+  background:var(--card);
+  cursor:pointer;
+  transition:all var(--tr);
+  position:relative;
+}
+.mdl-card:active{transform:scale(.98)}
+.mdl-card.connected{border-color:rgba(34,197,94,0.35);background:rgba(34,197,94,0.03)}
+.mdl-dot{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;
+  background:var(--muted-foreground);opacity:.5;
+  transition:all var(--tr);
+}
+.mdl-card.connected .mdl-dot{background:#22c55e;opacity:1;animation:pulse 2s infinite}
+.mdl-info{flex:1;min-width:0}
+.mdl-name{font-size:.48rem;font-weight:600;font-family:var(--font-serif);color:var(--card-foreground);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mdl-url{font-size:.34rem;color:var(--muted-foreground);font-family:var(--font-mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.mdl-meta{font-size:.3rem;color:var(--muted-foreground);font-family:var(--font-mono);display:flex;gap:8px;margin-top:2px}
+.mdl-meta .mm-on{color:#22c55e}
+.mdl-arrow{font-size:.5rem;color:var(--muted-foreground);flex-shrink:0;opacity:.5}
+.mdl-add{
+  border:1px dashed var(--border);
+  background:transparent;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:12px;
+  border-radius:calc(var(--radius) + 0.1rem);
+  color:var(--muted-foreground);
+  font-size:.42rem;
+  font-family:var(--font-mono);
+  cursor:pointer;
+  transition:all var(--tr);
+}
+.mdl-add:active{transform:scale(.98)}
+.mdl-add:hover{border-color:var(--primary);color:var(--primary)}
+.mdl-empty{
+  text-align:center;padding:30px 0;
+  color:var(--muted-foreground);font-size:.4rem;
+}
+
+/* Model edit sheet */
+.mdl-form{display:flex;flex-direction:column;gap:10px}
+.mdl-form .fg{margin-bottom:0}
+.mdl-form .fg label{font-size:.38rem}
+.mdl-form .inp{font-size:.42rem}
+.mdl-form .key-wrap{position:relative}
+.mdl-form .key-wrap .inp{padding-right:36px}
+.mdl-form .key-toggle{
+  position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:var(--muted-foreground);
+  cursor:pointer;font-size:.5rem;padding:4px;
+}
+.mdl-form .key-toggle:active{opacity:.6}
+.mdl-form .btn-row{display:flex;gap:8px;margin-top:4px}
+.mdl-form .btn-row .btn{flex:1;padding:8px 0;font-size:.42rem}
+.mdl-form .test-result{
+  font-size:.36rem;padding:6px 10px;border-radius:calc(var(--radius) - 0.2rem);
+  text-align:center;font-family:var(--font-mono);
+}
+.mdl-form .test-result.ok{background:rgba(34,197,94,0.1);color:#22c55e;border:1px solid rgba(34,197,94,0.25)}
+.mdl-form .test-result.fail{background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.25)}
+.mdl-form .credit-row{display:flex;gap:8px}
+.mdl-form .credit-row .fg{flex:1}
+
 /* ═══ Mobile Tab Bar ═══ */
 .tabbar{display:none}
 .mobile-tabbar{
@@ -802,15 +871,15 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
 <div class="sidebar" id="sidebar">
   <div class="sb-brand">
     <svg class="inkos-logo" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="18" cy="18" r="17" fill="#1a1a1a"/>
+      <circle cx="18" cy="18" r="17" fill="var(--primary)"/>
       <path d="M12 22c0-4 4-10 6-12l3 3c-2 3-5 7-5 9s2 2 3 1l1-1c1-2 2-5 2-5" stroke="#ff6b35" stroke-width="1.5" stroke-linecap="round" fill="none"/>
       <path d="M20 11l2 2 1.5-1.5c.5-.5 1.5-.5 2 0l.5.5c.5.5.5 1.5 0 2L24 16" stroke="#d4a843" stroke-width="1.2" stroke-linecap="round" fill="none"/>
       <circle cx="15" cy="23" r="1.5" fill="#ff6b35" opacity="0.6"/>
       <circle cx="22" cy="12" r="1" fill="#d4a843" opacity="0.8"/>
     </svg>
     <div class="sb-titles">
-      <div class="sb-name">InkOS</div>
-      <div class="sb-ver">Studio v6.0</div>
+      <div class="sb-name">NOVEL</div>
+      <div class="sb-ver">Studio v7.0</div>
     </div>
   </div>
 
@@ -908,7 +977,7 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
       <div class="page-inner" style="padding-bottom:0">
         <div class="dash-header">
           <h1>⌘ 工作台</h1>
-          <span class="dh-sub">InkOS Studio · 开卷有益</span>
+          <span class="dh-sub">NOVEL Studio · 开卷有益</span>
         </div>
         <!-- Books Grid -->
         <div class="books-grid" id="booksGrid">
@@ -948,7 +1017,7 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
           <div class="chat-empty" id="chatEmpty">
             <div class="ce-ic">📖</div>
             <div class="ce-t">告诉我你想写什么...</div>
-            <div class="ce-s">选择一本书，输入写作指令开始创作。左侧「工作台」管理书架、大纲和角色。</div>
+            <div>选择一本书，输入写作指令开始创作。左侧「工作台」管理书架、大纲和角色。先在模型页添加模型。</div>
           </div>
         </div>
         <!-- Chat Input -->
@@ -968,17 +1037,7 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
     <!-- ══════ Models ══════ -->
     <div class="page" id="pg-models">
       <div class="page-inner">
-        <div class="set-sec">
-          <div class="set-sec-h">
-            <span class="ssh-ic">📦</span>
-            <span class="ssh-t">模型余额</span>
-            <span class="ssh-c" id="balanceCount">加载中...</span>
-          </div>
-          <div class="balance-grid" id="balanceGrid"></div>
-          <div class="set-sec-h" style="margin-top:10px"><span class="ssh-ic">➕</span><span class="ssh-t">添加模型</span></div>
-          <div class="fg-cont" id="modelForm"></div>
-          <div class="skel" style="height:70px"></div>
-        </div>
+        <div class="mdl-grid" id="mdlGrid"></div>
       </div>
     </div>
 
@@ -1006,17 +1065,17 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
           <div class="set-about">
             <div class="about-logo">
               <svg class="inkos-logo" viewBox="0 0 36 36" fill="none" style="width:28px;height:28px;display:inline-block;vertical-align:middle;margin-right:6px" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="18" cy="18" r="17" fill="#1a1a1a"/>
+                <circle cx="18" cy="18" r="17" fill="var(--primary)"/>
                 <path d="M12 22c0-4 4-10 6-12l3 3c-2 3-5 7-5 9s2 2 3 1l1-1c1-2 2-5 2-5" stroke="#ff6b35" stroke-width="1.5" stroke-linecap="round" fill="none"/>
                 <path d="M20 11l2 2 1.5-1.5c.5-.5 1.5-.5 2 0l.5.5c.5.5.5 1.5 0 2L24 16" stroke="#d4a843" stroke-width="1.2" stroke-linecap="round" fill="none"/>
                 <circle cx="15" cy="23" r="1.5" fill="#ff6b35" opacity="0.6"/>
                 <circle cx="22" cy="12" r="1" fill="#d4a843" opacity="0.8"/>
               </svg>
-              InkOS Studio
+              NOVEL Studio
             </div>
-            Pure AI Writing Workbench<br>
-            v6.0 · InkOS Design · Zero Dependencies<br>
-            由 Nous Research 打磨 · 开卷有益
+            AI Writing Workbench<br>
+            v7.0 · NOVEL Design · Zero Dependencies<br>
+            开卷有益
           </div>
         </div>
       </div>
@@ -1312,10 +1371,10 @@ function renderBalanceSidebar(){
   let cont = T('balanceSidebar');
   if(!cont) return;
   if(!WS.models.length){
-    cont.innerHTML = `<button class="sb-item" onclick="navTo('settings')"><span class="si">📦</span>模型余额<span class="sb-badge">0</span></button>`;
+    cont.innerHTML = `<button class="sb-item" onclick="navTo('models')"><span class="si">📦</span>模型余额<span class="sb-badge">0</span></button>`;
     return;
   }
-  cont.innerHTML = `<button class="sb-item" onclick="navTo('settings')"><span class="si">📦</span>模型余额<span class="sb-badge">${WS.models.length}</span></button>`;
+  cont.innerHTML = `<button class="sb-item" onclick="navTo('models')"><span class="si">📦</span>模型余额<span class="sb-badge">${WS.models.length}</span></button>`;
 }
 
 function addFoundryEntry(text){
@@ -1420,7 +1479,7 @@ function chatRenderBookSel(){
 function chatRenderModelPicker(){
   let sel = T('chatModel');
   if(!sel) return;
-  let models = WS.models.filter(m => m.model);
+  let models = WS.models.filter(m => m.model_id);
   if(!models.length){
     sel.innerHTML = '<option value="">暂无模型 (请先配置)</option>';
     return;
@@ -1648,67 +1707,176 @@ async function loadSettings(){
   // Settings page: just system settings + about
 }
 
+// ── Models (InkOS-style card UI) ──
 async function loadModels(){
   try{
     let p = await api('/api/models').catch(() => ({models:[]}));
-    WS.models = (p.models || []).filter(x => x.model_id);
-    renderBalanceGrid();
-    T('balanceCount').textContent = WS.models.length + ' 个模型';
+    WS.models = (p.models || []).filter(x => x.model_id || x.name);
+    renderModelGrid();
     renderBalanceSidebar();
-    // Render add model form
-    addModelForm();
   }catch(e){
-    T('balanceCount').textContent = '获取失败';
+    T('mdlGrid') && (T('mdlGrid').innerHTML = '<div class="mdl-empty">❌ 加载失败</div>');
   }
 }
 
-function renderBalanceGrid(){
-  let grid = T('balanceGrid');
+function renderModelGrid(){
+  let grid = T('mdlGrid');
   if(!grid) return;
+  let html = '';
+  // Add card button first
+  html += '<div class="mdl-add" onclick="openModelSheet(null)">➕ 添加模型</div>';
+  
   if(!WS.models.length){
-    grid.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted-foreground);font-size:.85rem">暂无模型，点击下方「添加模型」配置</div>';
+    html += '<div class="mdl-empty">暂无模型，点击上方「添加模型」配置你的第一个 AI 写作助手</div>';
+    grid.innerHTML = html;
     return;
   }
-  grid.innerHTML = WS.models.map(m => {
-    let credits_total = m.total_credits || 0;
-    let credits_used = m.used_credits || 0;
-    let credits_remain = credits_total - credits_used;
-    let pct = credits_total > 0 ? (credits_used / credits_total * 100).toFixed(1) : 0;
-    let usage = '<div class="bc-usage"><span>用量: <span class="bc-val">' + credits_used + '/' + credits_total + '</span> (' + pct + '%)</span></div>' +
-      '<div class="bc-bar"><div class="bc-bar-fill" style="width:' + pct + '%"></div></div>';
-    return '<div class="balance-card">' +
-      '<div class="bc-name"><span class="bc-ic">📦</span>' + E(m.name || m.model_id || '未命名') + '</div>' +
-      '<div class="bc-url">' + E(m.base_url || '') + '</div>' +
-      usage +
-      '<button class="btn dan sm" style="margin-top:6px;width:100%;font-size:.4rem" onclick="delModel(\'' + m.id + '\')">删除</button>' +
-      '</div>';
+  
+  html += WS.models.map(m => {
+    let connected = m.has_key;
+    let name = E(m.name || m.model_id || '未命名');
+    let url = E(m.base_url || '');
+    let modeId = E(m.model_id || '');
+    let credits = (m.total_credits||0) > 0 ? Math.round((m.used_credits||0)/(m.total_credits||1)*100) + '%' : '';
+    return '<div class="mdl-card' + (connected?' connected':'') + '" onclick="openModelSheet(\'' + m.id + '\')">' +
+      '<div class="mdl-dot"></div>' +
+      '<div class="mdl-info">' +
+        '<div class="mdl-name">' + name + '</div>' +
+        (url ? '<div class="mdl-url">' + url + '</div>' : '') +
+        '<div class="mdl-meta">' +
+          '<span>' + modeId + '</span>' +
+          (connected ? '<span class="mm-on">✓ 已连接</span>' : '<span>未配置 Key</span>') +
+          (credits ? '<span>' + credits + '</span>' : '') +
+        '</div>' +
+      '</div>' +
+      '<span class="mdl-arrow">›</span>' +
+    '</div>';
   }).join('');
+  
+  grid.innerHTML = html;
 }
 
-function addModelForm(){
-  let form = T('modelForm');
-  if(!form) return;
-  form.innerHTML = '<div class="fg"><label>名称</label><input class="inp" id="mName" placeholder="例如: DeepSeek"></div>' +
-    '<div class="fg"><label>API 地址</label><input class="inp" id="mUrl" placeholder="https://api.deepseek.com/v1" value="https://api.deepseek.com/v1"></div>' +
-    '<div class="fg"><label>模型 ID</label><input class="inp" id="mModel" placeholder="deepseek-chat"></div>' +
-    '<div class="fg"><label>API Key</label><input class="inp" id="mKey" type="password" placeholder="sk-..."></div>' +
-    '<div style="display:flex;gap:6px"><div class="fg" style="flex:1"><label>总额度</label><input class="inp" id="mTotal" type="number" placeholder="1000000" value="1000000"></div>' +
-    '<div class="fg" style="flex:1"><label>已用额度</label><input class="inp" id="mUsed" type="number" placeholder="0" value="0"></div></div>' +
-    '<button class="btn pri full" style="margin-top:6px" onclick="saveModel()">添加模型</button>';
+// Open bottom sheet to edit/add model
+function openModelSheet(id){
+  let editMode = !!id;
+  let m = id ? (WS.models.find(x => x.id === id) || {}) : {};
+  
+  let title = editMode ? '编辑模型: ' + E(m.name||'') : '添加模型';
+  let body = '<div class="mdl-form">';
+  body += '<div class="fg"><label>名称</label><input class="inp" id="meName" value="' + E(m.name||'') + '" placeholder="例如: DeepSeek"></div>';
+  body += '<div class="fg"><label>API 地址</label><input class="inp" id="meUrl" value="' + E(m.base_url||'https://api.deepseek.com') + '" placeholder="https://api.deepseek.com"></div>';
+  body += '<div class="fg"><label>模型 ID</label><input class="inp" id="meModel" value="' + E(m.model_id||'') + '" placeholder="deepseek-chat"></div>';
+  body += '<div class="fg"><label>API Key</label><div class="key-wrap">' +
+    '<input class="inp" id="meKey" type="password" placeholder="sk-..." value="">' +
+    '<button class="key-toggle" onclick="toggleKeyVis()">👁️</button></div>' +
+    (m.has_key ? '<div style="font-size:.3rem;color:var(--muted-foreground);margin-top:-4px">已有 Key，留空则保留原 Key</div>' : '') +
+  '</div>';
+  body += '<div class="credit-row">' +
+    '<div class="fg"><label>总额度</label><input class="inp" id="meTotal" type="number" value="' + (m.total_credits||'1000000') + '" placeholder="1000000"></div>' +
+    '<div class="fg"><label>已用额度</label><input class="inp" id="meUsed" type="number" value="' + (m.used_credits||'0') + '" placeholder="0"></div>' +
+  '</div>';
+  
+  // Test connection result area
+  body += '<div id="meTestResult" class="test-result" style="display:none"></div>';
+  
+  // Buttons
+  body += '<div class="btn-row">';
+  body += '<button class="btn" onclick="testModelConn(\'' + (id||'') + '\')" id="meTestBtn">🔍 测试连接</button>';
+  body += '<button class="btn pri" onclick="saveModelSheet(\'' + (id||'') + '\')" id="meSaveBtn">💾 保存</button>';
+  if(editMode){
+    body += '<button class="btn" style="color:var(--destructive);border-color:rgba(239,68,68,0.3)" onclick="delModel(\'' + id + '\')">🗑️ 删除</button>';
+  }
+  body += '</div></div>';
+  
+  openSheet(title, body);
 }
 
-async function saveModel(){
-  let name=T('mName'),url=T('mUrl'),model=T('mModel'),key=T('mKey'),total=T('mTotal'),used=T('mUsed');
-  if(!name.value.trim()){toast('请输入模型名称','bad');return;}
+function toggleKeyVis(){
+  let inp = T('meKey');
+  if(!inp) return;
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+async function testModelConn(id){
+  // First save current model to test it
+  let btn = T('meTestBtn');
+  let res = T('meTestResult');
+  if(!btn || !res) return;
+  
+  let name = T('meName')?.value.trim();
+  let url = T('meUrl')?.value.trim();
+  let modelId = T('meModel')?.value.trim();
+  let key = T('meKey')?.value.trim();
+  
+  if(!url){ res.style.display='block'; res.className='test-result fail'; res.textContent='❌ 请输入 API 地址'; return; }
+  if(!key && !id){ res.style.display='block'; res.className='test-result fail'; res.textContent='❌ 请输入 API Key'; return; }
+  
+  btn.disabled = true;
+  btn.textContent = '⏳ 测试中...';
+  res.style.display = 'none';
+  
   try{
-    let r = await api('/api/models', {method:'POST', body:JSON.stringify({
-      name: name.value.trim(), base_url: url.value.trim(),
-      model_id: model.value.trim(), api_key: key.value.trim(),
-      total_credits: parseFloat(total.value)||0, used_credits: parseFloat(used.value)||0
-    })});
-    toast('模型已添加 ✓','good');
+    // Save first, then test
+    let saveResult = await saveModelInternal(id, name, url, modelId, key);
+    let testId = id || saveResult?.model?.id;
+    if(!testId){ throw new Error('保存失败'); }
+    
+    let r = await api('/api/models/' + testId + '/test', {method:'POST'});
+    res.style.display = 'block';
+    if(r.success && r.count > 0){
+      res.className = 'test-result ok';
+      res.innerHTML = '✅ 连接成功！检测到 ' + r.count + ' 个模型：<br>' +
+        r.models.slice(0,5).map(mx => '&nbsp;· ' + E(mx.id)).join('<br>') +
+        (r.count > 5 ? '<br>&nbsp;... 还有 ' + (r.count-5) + ' 个' : '');
+      if(!T('meModel')?.value && r.models[0]){
+        T('meModel').value = r.models[0].id;
+      }
+    } else if(r.success) {
+      res.className = 'test-result ok';
+      res.textContent = '✅ 连接成功，但未检测到模型列表（请手动填写模型 ID）';
+    } else {
+      res.className = 'test-result fail';
+      res.textContent = '❌ ' + E(r.error || '连接失败');
+    }
+  }catch(e){
+    res.style.display = 'block';
+    res.className = 'test-result fail';
+    res.textContent = '❌ ' + E(e.message || '连接失败');
+  }
+  
+  btn.disabled = false;
+  btn.textContent = '🔍 测试连接';
+  loadModels();
+}
+
+async function saveModelInternal(id, name, url, modelId, key){
+  if(!name){ toast('请输入模型名称','bad'); throw new Error('no name'); }
+  let r = await api('/api/models', {method:'POST', body:JSON.stringify({
+    name: name, base_url: url, model_id: modelId,
+    api_key: key,
+    total_credits: parseFloat(T('meTotal')?.value)||0,
+    used_credits: parseFloat(T('meUsed')?.value)||0
+  })});
+  return r;
+}
+
+async function saveModelSheet(id){
+  let btn = T('meSaveBtn');
+  if(btn) btn.disabled = true;
+  try{
+    await saveModelInternal(id,
+      T('meName')?.value.trim(),
+      T('meUrl')?.value.trim(),
+      T('meModel')?.value.trim(),
+      T('meKey')?.value.trim()
+    );
+    toast('✓ 已保存','good');
+    closeSheet();
     loadModels();
-  }catch(e){toast(e.message,'bad')}
+  }catch(e){
+    toast(e.message || '保存失败','bad');
+  }
+  if(btn) btn.disabled = false;
 }
 
 async function delModel(id){
@@ -1716,6 +1884,7 @@ async function delModel(id){
   try{
     await api('/api/models/'+id, {method:'DELETE'});
     toast('已删除','good');
+    closeSheet();
     loadModels();
   }catch(e){toast(e.message,'bad')}
 }
