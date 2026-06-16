@@ -2,17 +2,19 @@
 """InkOS Studio v6.0 — AI Writing Workbench + Model Balance"""
 import sys, os, json, datetime, uuid, shutil
 from pathlib import Path
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import asyncio
+import urllib.request
 
 HOST = os.environ.get("HOST", "0.0.0.0")
 PORT = int(os.environ.get("PORT", "8080"))
 DATA_DIR = Path(os.environ.get("DATA_DIR", str(Path(__file__).parent / "data")))
 
-app = FastAPI(title="InkOS Studio", version="6.0.0")
+app = FastAPI(title="InkOS Studio", version="6.6.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 BASE_DIR = Path(__file__).parent
@@ -94,8 +96,6 @@ def delete_model(model_id: str):
 # AI Chat (for writing prompts)
 # ═══════════════════════════════════════
 
-import urllib.request
-
 class ChatInput(BaseModel):
     messages: list = []
     provider_id: str = ""
@@ -143,6 +143,91 @@ def write_chat(req: ChatInput):
         return {"role": "assistant", "content": f"[API {e.code}] {err}", "tokens": 0, "error": str(err)[:200]}
     except Exception as e:
         return {"role": "assistant", "content": f"[Error] {str(e)[:200]}", "tokens": 0, "error": str(e)[:200]}
+
+@app.post("/api/chat/stream")
+async def write_chat_stream(req: ChatInput):
+    models_data = _load_json(BALANCE_FILE, {"models": []})
+    provider = None
+    if req.provider_id:
+        for m in models_data.get("models", []):
+            if m.get("id") == req.provider_id:
+                provider = m
+                break
+    if not provider:
+        for m in models_data.get("models", []):
+            if m.get("model_id"):
+                provider = m
+                break
+    
+    async def event_stream():
+        if not provider:
+            yield f"data: {json.dumps({'type':'error','content':'⚠️ 未配置模型。请先在设置中添加模型。'})}\n\n"
+            yield "data: [DONE]\n\n"
+            return
+        
+        url = (provider.get("base_url", "").rstrip("/") + "/chat/completions")
+        req_body = json.dumps({
+            "model": provider.get("model_id", "gpt-3.5-turbo"),
+            "messages": req.messages or [{"role": "user", "content": "Hello"}],
+            "max_tokens": 4096,
+            "temperature": 0.7,
+            "stream": True
+        }).encode()
+        
+        try:
+            req_http = urllib.request.Request(url, data=req_body, headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {provider.get('api_key', '')}"
+            })
+            full_content = ""
+            token_count = 0
+            with urllib.request.urlopen(req_http, timeout=120) as resp:
+                while True:
+                    line = resp.readline()
+                    if not line:
+                        break
+                    line = line.decode('utf-8', errors='replace').strip()
+                    if not line or line.startswith(':'):
+                        continue
+                    if line.startswith('data: '):
+                        data_str = line[6:]
+                        if data_str.strip() == '[DONE]':
+                            break
+                        try:
+                            chunk = json.loads(data_str)
+                            delta = chunk.get('choices', [{}])[0].get('delta', {})
+                            content = delta.get('content', '')
+                            if content:
+                                full_content += content
+                                token_count += 1
+                                yield f"data: {json.dumps({'type':'token','content':content,'tokens':token_count})}\n\n"
+                                await asyncio.sleep(0)
+                            # Check if finish_reason is set
+                            finish = chunk.get('choices', [{}])[0].get('finish_reason')
+                            if finish:
+                                # Estimate total tokens
+                                total = estimate_tokens(full_content)
+                                # Update usage
+                                m = provider
+                                m["used_credits"] = m.get("used_credits", 0) + total
+                                _save_json(BALANCE_FILE, models_data)
+                                yield f"data: {json.dumps({'type':'done','content':full_content,'tokens':total,'provider':provider.get('name')})}\n\n"
+                        except json.JSONDecodeError:
+                            continue
+            
+            if not full_content:
+                yield f"data: {json.dumps({'type':'error','content':'AI 返回内容为空'})}\n\n"
+            yield "data: [DONE]\n\n"
+            
+        except urllib.error.HTTPError as e:
+            err = e.read().decode()[:500]
+            yield f"data: {json.dumps({'type':'error','content':f'[API {e.code}] {err}'})}\n\n"
+            yield "data: [DONE]\n\n"
+        except Exception as e:
+            yield f"data: {json.dumps({'type':'error','content':f'[Error] {str(e)[:200]}'})}\n\n"
+            yield "data: [DONE]\n\n"
+    
+    return StreamingResponse(event_stream(), media_type="text/event-stream")
 
 # ═══════════════════════════════════════
 # Writing / Book Management

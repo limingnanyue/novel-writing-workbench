@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <meta name="theme-color" content="#faf6f0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>InkOS Studio</title>
+<title>InkOS Studio v6.6</title>
 <style>
 /* ═══════════════════════════════════════════
    InkOS Design System — Pure AI Writing Workbench
@@ -1202,10 +1202,10 @@ async function api(u, o={}){
 async function loadDashboard(){
   try{
     let [h, p] = await Promise.all([
-      api('/api/health').catch(() => ({providers_count:0, models_count:0, total_requests:0, total_tokens:0, is_inkos:true})),
-      api('/api/providers').catch(() => ({providers:[]}))
+      api('/api/health').catch(() => ({providers_count:0, models_count:0, total_requests:0, total_tokens:0})),
+      api('/api/models').catch(() => ({models:[]}))
     ]);
-    WS.models = (p.providers || []).filter(x => x.model);
+    WS.models = (p.models || []).filter(x => x.model_id);
     // Render books grid
     renderBooksGrid();
     // Render sidebar bookshelf
@@ -1513,12 +1513,14 @@ async function sendChat(){
   WS.writeMsgs.push({role:'user', content:text, time:Date.now()});
   if(WS.writeMsgs.length > 100) WS.writeMsgs = WS.writeMsgs.slice(-100);
 
-  // Typing indicator
-  let ty = document.createElement('div');
-  ty.className = 'msg assistant';
-  ty.id = 'typingInd';
-  ty.innerHTML = '<div class="m-av">✦</div><div class="m-bub"><div class="typing-indicator"><span></span><span></span><span></span></div></div>';
-  body.appendChild(ty);
+  // Create assistant message container with streaming bubble
+  let am = document.createElement('div');
+  am.className = 'msg assistant';
+  am.style.animation = 'none';
+  let mTime = now();
+  am.innerHTML = '<div class="m-av">✦</div><div><div class="m-bub streaming" id="streamBub">▍</div><div class="m-time">' + mTime + ' <span class="tk-counter" id="tkCounter">⚡0</span></div></div>';
+  body.appendChild(am);
+  let bub = T('streamBub');
   body.scrollTop = body.scrollHeight;
 
   T('sendBtn').disabled = true;
@@ -1528,61 +1530,97 @@ async function sendChat(){
     let providerId = modelSel ? modelSel.value : '';
     let msgs = WS.writeMsgs.slice(-10).map(m => ({role:m.role, content:m.content}));
     let book = WS.books.find(b => b.id === WS.activeBookId);
-    let ctx = book ? '[写作上下文: 《' + book.title + '》] ' : '';
+    let ctx = book ? '[写作上下文: 《' + book.title + '》' + (book.genre?' · '+book.genre:'') + '] ' : '';
 
-    let resp;
-    if(providerId){
-      resp = await api('/api/chat', {
-        method:'POST',
-        body: JSON.stringify({
-          messages: [{role:'system', content: ctx + '你是一位专业小说写作助手，帮助作者创作。请保持自然的文风。'}].concat(msgs),
-          provider_id: providerId
-        })
-      });
-    } else {
-      // Fallback: use first available model
-      let models = WS.models.filter(m => m.model);
-      if(models.length){
-        resp = await api('/api/chat', {
-          method:'POST',
-          body: JSON.stringify({
-            messages: [{role:'system', content: ctx + '你是一位专业小说写作助手。'}].concat(msgs),
-            provider_id: models[0].id
-          })
-        });
-      } else {
-        throw new Error('请先在设置中配置模型');
+    // Determine provider
+    if(!providerId){
+      let models = WS.models.filter(m => m.model_id);
+      if(models.length) providerId = models[0].id;
+      else throw new Error('请先在设置中配置模型');
+    }
+
+    // SSE streaming
+    let resp = await fetch('/api/chat/stream', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        messages: [{role:'system', content: ctx + '你是一位专业小说写作助手。请保持自然的文风。'}].concat(msgs),
+        provider_id: providerId
+      })
+    });
+
+    if(!resp.ok){ throw new Error('HTTP ' + resp.status); }
+
+    let reader = resp.body.getReader();
+    let decoder = new TextDecoder();
+    let fullContent = '';
+    let tkCount = 0;
+    let buffer = '';
+
+    while(true){
+      let {done, value} = await reader.read();
+      if(done) break;
+
+      buffer += decoder.decode(value, {stream: true});
+      let lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      for(let line of lines){
+        line = line.trim();
+        if(!line || line === 'data: [DONE]') continue;
+        if(line.startsWith('data: ')){
+          try{
+            let evt = JSON.parse(line.slice(6));
+            if(evt.type === 'token'){
+              fullContent += evt.content;
+              tkCount = evt.tokens;
+              bub.innerHTML = E(fullContent) + '▍';
+              let ctr = T('tkCounter');
+              if(ctr) ctr.textContent = '⚡' + tkCount;
+              body.scrollTop = body.scrollHeight;
+            } else if(evt.type === 'done'){
+              fullContent = evt.content;
+              tkCount = evt.tokens || estimateTokens(fullContent);
+              let ctr = T('tkCounter');
+              if(ctr) ctr.textContent = '⚡' + tkCount;
+            } else if(evt.type === 'error'){
+              bub.innerHTML = '❌ ' + E(evt.content);
+            }
+          } catch(e){}
+        }
       }
     }
 
-    ty.remove();
-    let am = document.createElement('div');
-    am.className = 'msg assistant';
-    am.innerHTML = '<div class="m-av">✦</div><div><div class="m-bub">' + E(resp.content) + '</div><div class="m-time">' + now() + '</div></div>';
-    body.appendChild(am);
-    WS.writeMsgs.push({role:'assistant', content:resp.content, time:Date.now()});
-
-    // Auto-save chapter if content is substantial
-    if(WS.activeBookId && resp.content.length > 200 &&
-       !text.startsWith('📋') && !text.startsWith('👤') && !text.startsWith('🏆') &&
-       !text.startsWith('🔬') && !text.startsWith('✅') && !text.startsWith('💾') &&
-       !text.startsWith('📈') && !text.startsWith('🔍') && !text.startsWith('📄')){
-      autoSaveChapter(resp.content);
+    // Finalize
+    bub.classList.remove('streaming');
+    if(!fullContent && !bub.textContent.includes('❌')){
+      bub.innerHTML = '⚠️ 未获取到回复，请检查模型配置。';
     }
-    renderSidebarHistory();
-    addFoundryEntry('✦ AI回复 · ' + (resp.content.length) + '字');
+    if(fullContent){
+      bub.innerHTML = E(fullContent);
+      WS.writeMsgs.push({role:'assistant', content:fullContent, time:Date.now()});
+
+      // Auto-save chapter
+      if(WS.activeBookId && fullContent.length > 200 &&
+         !text.startsWith('📋') && !text.startsWith('👤') && !text.startsWith('🏆') &&
+         !text.startsWith('🔬') && !text.startsWith('✅') && !text.startsWith('💾') &&
+         !text.startsWith('📈') && !text.startsWith('🔍') && !text.startsWith('📄')){
+        autoSaveChapter(fullContent);
+      }
+      renderSidebarHistory();
+      addFoundryEntry('✦ AI回复 · ' + fullContent.length + '字 · ⚡' + tkCount + 't');
+    }
 
   }catch(e){
-    ty.remove();
-    let em = document.createElement('div');
-    em.className = 'msg assistant';
-    em.innerHTML = '<div class="m-av">✦</div><div><div class="m-bub">❌ ' + E(e.message) + '</div></div>';
-    body.appendChild(em);
+    let bub = T('streamBub');
+    if(bub) bub.innerHTML = '❌ ' + E(e.message);
   }
 
   T('sendBtn').disabled = false;
   body.scrollTop = body.scrollHeight;
 }
+
+function estimateTokens(t){ return Math.max(1, Math.ceil((t||'').length / 2)); }
 
 function autoSaveChapter(content){
   let bid = WS.activeBookId;
