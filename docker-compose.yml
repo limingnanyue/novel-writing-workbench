@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  workbench:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8080
+      - DATA_DIR=/data
+    volumes:
+      - workbench_data:/data
+      # Optional: mount novel-creation-omnibus modules
+      # - /path/to/novel-creation-omnibus/references/modules:/app/modules
+    restart: unless-stopped
+
+volumes:
+  workbench_data:

@@ -1,0 +1,17 @@
+[Unit]
+Description=Novel Writing Workbench
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/opt/novel-writing-workbench
+Environment=HOST=0.0.0.0
+Environment=PORT=8080
+Environment=DATA_DIR=/var/lib/workbench/data
+ExecStart=/usr/bin/python3 /opt/novel-writing-workbench/server.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

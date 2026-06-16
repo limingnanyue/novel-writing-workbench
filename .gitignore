@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+data/books/
+data/chapters/
+data/covers/
+data/token_usage.json
+data/writing_memory.json
+data/ai_providers.json
+chapters/
+.inkos/
+inkos.json
+radar/
+*.egg-info/
+dist/
+.env
