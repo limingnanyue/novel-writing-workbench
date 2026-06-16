@@ -965,10 +965,9 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
       </div>
     </div>
 
-    <!-- ══════ Settings ══════ -->
-    <div class="page" id="pg-settings">
+    <!-- ══════ Models ══════ -->
+    <div class="page" id="pg-models">
       <div class="page-inner">
-        <!-- Model Balance -->
         <div class="set-sec">
           <div class="set-sec-h">
             <span class="ssh-ic">📦</span>
@@ -979,8 +978,13 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
           <div class="set-sec-h" style="margin-top:10px"><span class="ssh-ic">➕</span><span class="ssh-t">添加模型</span></div>
           <div class="fg-cont" id="modelForm"></div>
           <div class="skel" style="height:70px"></div>
-          </div>
         </div>
+      </div>
+    </div>
+
+    <!-- ══════ Settings ══════ -->
+    <div class="page" id="pg-settings">
+      <div class="page-inner">
         <!-- System Settings -->
         <div class="set-sec">
           <div class="set-sec-h">
@@ -1023,6 +1027,7 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
   <div class="mobile-tabbar" id="mobileTabbar">
     <button class="mobile-tab active" data-route="dashboard"><span class="mti">⌘</span>工作台</button>
     <button class="mobile-tab" data-route="chat"><span class="mti">💬</span>对话</button>
+    <button class="mobile-tab" data-route="models"><span class="mti">📦</span>模型</button>
     <button class="mobile-tab" data-route="settings"><span class="mti">⚙️</span>设置</button>
   </div>
 </div>
@@ -1122,9 +1127,9 @@ function setLang(l){
 setLang(currentLang);
 
 // ── Hash-based Routing ──
-const ROUTES = {dashboard:0, chat:1, settings:2};
-const PAGE_IDS = ['pg-dashboard', 'pg-chat', 'pg-settings'];
-const TAB_ICONS = ['⌘', '💬', '⚙️'];
+const ROUTES = {dashboard:0, chat:1, models:2, settings:3};
+const PAGE_IDS = ['pg-dashboard', 'pg-chat', 'pg-models', 'pg-settings'];
+const TAB_ICONS = ['⌘', '💬', '📦', '⚙️'];
 
 function navTo(route){
   window.location.hash = route;
@@ -1137,13 +1142,14 @@ function handleRoute(){
   document.querySelectorAll('.page').forEach((el, i) => el.classList.toggle('active', i === idx));
   document.querySelectorAll('.mobile-tab').forEach((el) => el.classList.toggle('active', el.dataset.route === hash));
   // Update header breadcrumb
-  let names = {dashboard:'工作台', chat:'对话', settings:'设置'};
+  let names = {dashboard:'工作台', chat:'对话', models:'模型', settings:'设置'};
   let headerLabel = T('mainHeader')?.querySelector('.hb span');
   if(headerLabel) headerLabel.textContent = names[hash] || '首页';
   // Load content
   if(idx === 0) loadDashboard();
   if(idx === 1) loadChat();
-  if(idx === 2) loadSettings();
+  if(idx === 2) loadModels();
+  if(idx === 3) loadSettings();
 }
 
 window.addEventListener('hashchange', handleRoute);
@@ -1639,6 +1645,10 @@ function autoSaveChapter(content){
 
 // ── Settings ──
 async function loadSettings(){
+  // Settings page: just system settings + about
+}
+
+async function loadModels(){
   try{
     let p = await api('/api/models').catch(() => ({models:[]}));
     WS.models = (p.models || []).filter(x => x.model_id);
@@ -1697,7 +1707,7 @@ async function saveModel(){
       total_credits: parseFloat(total.value)||0, used_credits: parseFloat(used.value)||0
     })});
     toast('模型已添加 ✓','good');
-    loadSettings();
+    loadModels();
   }catch(e){toast(e.message,'bad')}
 }
 
@@ -1706,7 +1716,7 @@ async function delModel(id){
   try{
     await api('/api/models/'+id, {method:'DELETE'});
     toast('已删除','good');
-    loadSettings();
+    loadModels();
   }catch(e){toast(e.message,'bad')}
 }
 
