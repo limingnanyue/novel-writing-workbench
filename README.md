@@ -127,6 +127,26 @@ python3 server.py
 
 环境变量：`HOST`（默认 `0.0.0.0`）、`PORT`（默认 `8080`）、`DATA_DIR`（默认 `./data`）
 
+## 📡 配置模型
+
+首次使用时，需在 ⚙️ 设置页配置 AI 模型：
+
+```
+1. 打开 InkOS Studio → 点击 ⚙️ 设置
+2. 找到「添加模型」区域，填写：
+   ├ 名称:     DeepSeek
+   ├ API 地址:  https://api.deepseek.com/v1
+   ├ 模型 ID:   deepseek-chat
+   ├ API Key:   sk-...
+   ├ 总额度:    1000000（可选，用于用量追踪）
+   └ 已用额度:  0
+3. 点击「添加模型」
+4. 回到 💬 对话页面 → 顶部选择刚添加的模型
+5. 开始写作！
+```
+
+支持所有 OpenAI 兼容 API（DeepSeek、Kilo、Pollinations、LLM7、OpenRouter 等）。
+
 ---
 
 ## 📦 技术栈
