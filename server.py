@@ -40,12 +40,16 @@ BALANCE_FILE = DATA_DIR / "models.json"
 
 @app.get("/api/models")
 def list_models():
-    return _load_json(BALANCE_FILE, {"models": []})
+    data = _load_json(BALANCE_FILE, {"models": []})
+    for m in data.get("models", []):
+        m["has_key"] = bool(m.pop("api_key", ""))
+    return data
 
 class ModelInput(BaseModel):
     name: str
     base_url: str = ""
     model_id: str = ""
+    api_key: str = ""
     total_credits: float = 0
     used_credits: float = 0
     expires: str = ""
@@ -58,6 +62,7 @@ def add_model(req: ModelInput):
         "name": req.name,
         "base_url": req.base_url,
         "model_id": req.model_id,
+        "api_key": req.api_key,
         "total_credits": req.total_credits,
         "used_credits": req.used_credits,
         "expires": req.expires,
@@ -68,10 +73,15 @@ def add_model(req: ModelInput):
             entry["id"] = m.get("id", entry["id"])
             data["models"][i] = entry
             _save_json(BALANCE_FILE, data)
-            return {"model": entry, "updated": True}
+            # Strip api_key from response
+            resp = {k: v for k, v in entry.items() if k != "api_key"}
+            resp["has_key"] = bool(entry.get("api_key"))
+            return {"model": resp, "updated": True}
     data.setdefault("models", []).append(entry)
     _save_json(BALANCE_FILE, data)
-    return {"model": entry, "created": True}
+    resp = {k: v for k, v in entry.items() if k != "api_key"}
+    resp["has_key"] = bool(entry.get("api_key"))
+    return {"model": resp, "created": True}
 
 @app.delete("/api/models/{model_id}")
 def delete_model(model_id: str):
@@ -81,7 +91,62 @@ def delete_model(model_id: str):
     return {"deleted": True}
 
 # ═══════════════════════════════════════
+# AI Chat (for writing prompts)
+# ═══════════════════════════════════════
+
+import urllib.request
+
+class ChatInput(BaseModel):
+    messages: list = []
+    provider_id: str = ""
+
+def estimate_tokens(text):
+    return max(1, len(text) // 2)
+
+@app.post("/api/chat")
+def write_chat(req: ChatInput):
+    models_data = _load_json(BALANCE_FILE, {"models": []})
+    provider = None
+    if req.provider_id:
+        for m in models_data.get("models", []):
+            if m.get("id") == req.provider_id:
+                provider = m
+                break
+    if not provider:
+        provider = next(iter(m.get("models", [])), None) if models_data.get("models") else None
+    if not provider:
+        return {"role": "assistant", "content": "⚠️ 未配置模型。请先在设置中添加模型（名称、API地址、Key、模型ID）。", "tokens": 0, "error": "no_model"}
+    
+    url = (provider.get("base_url", "").rstrip("/") + "/chat/completions")
+    body = json.dumps({
+        "model": provider.get("model_id", "gpt-3.5-turbo"),
+        "messages": req.messages or [{"role": "user", "content": "Hello"}],
+        "max_tokens": 4096,
+        "temperature": 0.7
+    }).encode()
+    req_http = urllib.request.Request(url, data=body, headers={
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {provider.get('api_key', '')}"
+    })
+    try:
+        with urllib.request.urlopen(req_http, timeout=120) as resp:
+            data = json.loads(resp.read())
+            content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+            tokens = estimate_tokens(content)
+            # Update usage
+            m = provider
+            m["used_credits"] = m.get("used_credits", 0) + tokens
+            _save_json(BALANCE_FILE, models_data)
+            return {"role": "assistant", "content": content, "tokens": tokens, "provider": provider.get("name")}
+    except urllib.error.HTTPError as e:
+        err = e.read().decode()[:500]
+        return {"role": "assistant", "content": f"[API {e.code}] {err}", "tokens": 0, "error": str(err)[:200]}
+    except Exception as e:
+        return {"role": "assistant", "content": f"[Error] {str(e)[:200]}", "tokens": 0, "error": str(e)[:200]}
+
+# ═══════════════════════════════════════
 # Writing / Book Management
+
 # ═══════════════════════════════════════
 
 WRITING_DIR = DATA_DIR / "writing"

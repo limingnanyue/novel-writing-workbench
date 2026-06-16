@@ -975,8 +975,10 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
             <span class="ssh-t">模型余额</span>
             <span class="ssh-c" id="balanceCount">加载中...</span>
           </div>
-          <div class="balance-grid" id="balanceGrid">
-            <div class="skel" style="height:70px"></div>
+          <div class="balance-grid" id="balanceGrid"></div>
+          <div class="set-sec-h" style="margin-top:10px"><span class="ssh-ic">➕</span><span class="ssh-t">添加模型</span></div>
+          <div class="fg-cont" id="modelForm"></div>
+          <div class="skel" style="height:70px"></div>
           </div>
         </div>
         <!-- System Settings -->
@@ -1417,7 +1419,7 @@ function chatRenderModelPicker(){
     sel.innerHTML = '<option value="">暂无模型 (请先配置)</option>';
     return;
   }
-  sel.innerHTML = models.map(m => '<option value="' + m.id + '">' + E(m.name || m.model) + '</option>').join('');
+  sel.innerHTML = models.map(m => '<option value="' + m.id + '">' + E(m.name || m.model_id) + '</option>').join('');
 }
 
 function chatSelectBook(id){
@@ -1600,11 +1602,13 @@ function autoSaveChapter(content){
 // ── Settings ──
 async function loadSettings(){
   try{
-    let p = await api('/api/providers').catch(() => ({providers:[]}));
-    WS.models = (p.providers || []).filter(x => x.model);
+    let p = await api('/api/models').catch(() => ({models:[]}));
+    WS.models = (p.models || []).filter(x => x.model_id);
     renderBalanceGrid();
     T('balanceCount').textContent = WS.models.length + ' 个模型';
     renderBalanceSidebar();
+    // Render add model form
+    addModelForm();
   }catch(e){
     T('balanceCount').textContent = '获取失败';
   }
@@ -1614,20 +1618,58 @@ function renderBalanceGrid(){
   let grid = T('balanceGrid');
   if(!grid) return;
   if(!WS.models.length){
-    grid.innerHTML = '<div class="empty" style="font-size:.4rem">暂无已配置的模型。请在服务商配置 API 后刷新。</div>';
+    grid.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted-foreground);font-size:.85rem">暂无模型，点击下方「添加模型」配置</div>';
     return;
   }
   grid.innerHTML = WS.models.map(m => {
-    let usage = '';
-    if(m.total_tokens !== undefined) usage = '<div class="bc-usage"><span>Tokens: <span class="bc-val">' + m.total_tokens.toLocaleString() + '</span></span></div>';
-    else if(m.total_requests !== undefined) usage = '<div class="bc-usage"><span>请求: <span class="bc-val">' + m.total_requests + '</span></span></div>';
-    else usage = '<div class="bc-usage"><span>状态: <span class="bc-val">已配置</span></span></div>';
+    let credits_total = m.total_credits || 0;
+    let credits_used = m.used_credits || 0;
+    let credits_remain = credits_total - credits_used;
+    let pct = credits_total > 0 ? (credits_used / credits_total * 100).toFixed(1) : 0;
+    let usage = '<div class="bc-usage"><span>用量: <span class="bc-val">' + credits_used + '/' + credits_total + '</span> (' + pct + '%)</span></div>' +
+      '<div class="bc-bar"><div class="bc-bar-fill" style="width:' + pct + '%"></div></div>';
     return '<div class="balance-card">' +
-      '<div class="bc-name"><span class="bc-ic">📦</span>' + E(m.name || m.model || '未命名') + '</div>' +
+      '<div class="bc-name"><span class="bc-ic">📦</span>' + E(m.name || m.model_id || '未命名') + '</div>' +
       '<div class="bc-url">' + E(m.base_url || '') + '</div>' +
       usage +
+      '<button class="btn dan sm" style="margin-top:6px;width:100%;font-size:.4rem" onclick="delModel(\'' + m.id + '\')">删除</button>' +
       '</div>';
   }).join('');
+}
+
+function addModelForm(){
+  let form = T('modelForm');
+  if(!form) return;
+  form.innerHTML = '<div class="fg"><label>名称</label><input class="inp" id="mName" placeholder="例如: DeepSeek"></div>' +
+    '<div class="fg"><label>API 地址</label><input class="inp" id="mUrl" placeholder="https://api.deepseek.com/v1" value="https://api.deepseek.com/v1"></div>' +
+    '<div class="fg"><label>模型 ID</label><input class="inp" id="mModel" placeholder="deepseek-chat"></div>' +
+    '<div class="fg"><label>API Key</label><input class="inp" id="mKey" type="password" placeholder="sk-..."></div>' +
+    '<div style="display:flex;gap:6px"><div class="fg" style="flex:1"><label>总额度</label><input class="inp" id="mTotal" type="number" placeholder="1000000" value="1000000"></div>' +
+    '<div class="fg" style="flex:1"><label>已用额度</label><input class="inp" id="mUsed" type="number" placeholder="0" value="0"></div></div>' +
+    '<button class="btn pri full" style="margin-top:6px" onclick="saveModel()">添加模型</button>';
+}
+
+async function saveModel(){
+  let name=T('mName'),url=T('mUrl'),model=T('mModel'),key=T('mKey'),total=T('mTotal'),used=T('mUsed');
+  if(!name.value.trim()){toast('请输入模型名称','bad');return;}
+  try{
+    let r = await api('/api/models', {method:'POST', body:JSON.stringify({
+      name: name.value.trim(), base_url: url.value.trim(),
+      model_id: model.value.trim(), api_key: key.value.trim(),
+      total_credits: parseFloat(total.value)||0, used_credits: parseFloat(used.value)||0
+    })});
+    toast('模型已添加 ✓','good');
+    loadSettings();
+  }catch(e){toast(e.message,'bad')}
+}
+
+async function delModel(id){
+  if(!confirm('删除此模型配置？')) return;
+  try{
+    await api('/api/models/'+id, {method:'DELETE'});
+    toast('已删除','good');
+    loadSettings();
+  }catch(e){toast(e.message,'bad')}
 }
 
 // ── Init ──
