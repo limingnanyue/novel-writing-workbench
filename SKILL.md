@@ -1,40 +1,37 @@
 ---
 name: novel-writing-workbench
 description: >
-  LLM Gateway Dashboard v5.2 —— 移动优先+桌面响应式，零依赖模型管理面板。
-  4Tab导航(仪表盘/模型/写作/设置) + 连接测试 + 余额查询(3级回退) + 模型列表缓存 +
-  AI写作对话(5个快速指令+提供商切换+最后10条历史上下文) + Token统计 +
-  桌面端三栏布局(侧栏220px+中栏340px+详情面板) + PWA(ServiceWorker+manifest)。
-  taste-skill v2设计(DIALS 5/3/5·暗色奢华+电动蓝+终端美学)。
-  对标：one-api/lobe-chat/InkOS。
+  InkOS Studio v6.6 —— 100% InkOS UI faithful reproduction (Narcooo/inkos).
+  纯AI写作工作台（无LLM网关管理），零依赖单文件前端+FastAPI后端。
+  4Tab导航(⌘工作台/💬对话/🔌模型/⚙️设置) + InkOS oklch配色系统(暖纸/黑曜石双主题) +
+  3层字体(Instrument Serif/DM Sans/JetBrains Mono) + SVG噪点纹理 +
+  8动作交错入场动画 + 毛玻璃侧边栏(260px) + CSS Grid 0fr→1fr折叠 +
+  SSE流式AI对话 + 实时Token计数器(⚡) + 模型配置(余额/用量百分比/进度条) +
+  书籍管理/章节/角色/大纲/记忆台账 + 移动端底部3Tab + 桌面端侧边栏布局。
+  InkOS设计参考：https://github.com/Narcooo/inkos。
 triggers:
-  - LLM管理
-  - 模型管理
-  - API管理
-  - 网关面板
-  - 启动面板
-  - 工作台
+  - InkOS
+  - 写作工作台
   - AI写作
-  - 写作对话
-  - 测试连接
+  - 模型配置
   - 余额查询
-  - Token统计
-  - 提供商管理
-  - PWA
-version: 5.2
+  - 实时Token
+  - SSE流式
+  - 流式对话
+version: 6.6
 last_updated: 2026-06-16
 ---
 
-# LLM Gateway Dashboard v5.2 🔌
+# InkOS Studio v6.6 🖋️
 
-> **移动优先 + 桌面响应式 · 4Tab导航 · AI写作对话 · 连接测试 · 余额查询**
+> **100% InkOS UI · SSE流式对话 · 实时Token · 模型余额管理**
 
 ## 快速启动
 
 ```bash
 cd /home/agentuser/.hermes/skills/novel-writing-workbench
-fuser -k 8080/tcp 2>/dev/null; sleep 1
-python3 server.py &
+pip install fastapi uvicorn
+python3 server.py
 # → http://localhost:8080
 ```
 
@@ -44,74 +41,69 @@ python3 server.py &
 
 | Tab | 功能 |
 |:----|:-----|
-| ⌘ **仪表盘** | 统计卡片(提供商数/模型数/请求数) + 提供商列表 + 详情面板 |
-| 🔌 **模型** | 添加/编辑/删除提供商 + 测试连接(调用/v1/models) + 余额查询(3级回退) + 模型标签预览 |
-| ✍️ **写作** | AI对话 + 5个快速指令(写第1章/分析文风/起名/大纲/去AI味) + 提供商切换下拉 + 最后10条历史上下文 |
-| ⚙️ **设置** | 提供商管理 + Token统计(按提供商请求数/消耗) + 重置 + 关于 |
+| ⌘ **工作台** | 书籍网格(paper-sheet卡片) + 创作入口2x8网格 + 书架 + 写作进度(Manuscript Foundry) |
+| 💬 **对话** | SSE流式AI对话 + 实时Token计数器(⚡N递增) + 快捷指令 + 模型选择 + 自动保存章节 |
+| 🔌 **模型** | 模型列表 + 余额显示(用量百分比+进度条) + 添加/删除 |
+| ⚙️ **设置** | 模型配置(名称/地址/Key/ID/额度) + 系统设置 + 关于 |
 
-| 特性 | 说明 |
-|:-----|:-----|
-| 📱 **移动端** | 4Tab底部导航 + 底部弹出层 + 手势滑动 |
-| 🖥️ **桌面端** | ≥768px三栏布局(侧栏220px+中栏340px+详情面板)，≥1200px侧栏加宽至260px |
-| 💰 **余额查询** | 3级回退：Billing API → Usage API → Test Call |
-| 📦 **PWA** | Service Worker(cache-first) + manifest + 192/512图标 |
-| 🎨 **设计** | 暗色奢华(#0a0a0f) + 电动蓝(#5b8af7) + JetBrains Mono终端美学 |
+## 设计系统 (InkOS faithful)
 
-## 版本演进
+| 元素 | 亮色(默认) | 暗色(.dark) |
+|:-----|:----------|:-----------|
+| 背景 | oklch(0.985 0.005 80) 暖纸 | oklch(0.12 0.01 250) 黑曜石 |
+| 前景 | oklch(0.13 0.02 60) 深墨 | oklch(0.97 0.005 250) 白 |
+| 主色 | oklch(0.45 0.12 25) 赭红 | oklch(0.78 0.14 85) 暖琥珀 |
+| 卡片 | oklch(1 0 0) 白 | oklch(0.18 0.015 250) |
 
-**v5.0** 从写作工作台重构为LLM Gateway：去除全部写作功能，精简至3Tab
-**v5.1** 添加桌面端响应式三栏布局
-**v5.2** 写作Tab回归——AI对话写得比人好，砍了可惜
+- **3层字体**: Instrument Serif(内容) / DM Sans(UI) / JetBrains Mono(数据)
+- **噪点纹理**: body::before SVG filter, opacity 0.025-0.035
+- **毛玻璃**: backdrop-filter: blur(12px) on sidebar
+- **动画**: staggerIn(8项交错) / msgSlideLeft/Right / thinkGlow / typingWave / blinky
 
-### 余额查询三级回退
+## SSE 流式对话
 
-1. **Billing API**: `GET /dashboard/billing/subscription` → OpenAI风格
-2. **Usage API**: `GET /v1/usage?date=...` → 按天用量
-3. **Test Call**: 最小对话调用验证额度可用
+```python
+POST /api/chat/stream → SSE events:
+  data: {"type":"token","content":"...","tokens":N}  # 每个token触发
+  data: {"type":"done","content":"...","tokens":N}   # 完成
+  data: {"type":"error","content":"..."}              # 错误
+  data: [DONE]                                        # 流结束
+```
 
-## UI 设计系统
-
-**taste-skill v2 DIALS: 5/3/5**
-- 底色 `#0a0a0f` → 层级递进 s1/s2/s3
-- 电动蓝 `#5b8af7` 强调 + 算法绿 `#36c073` 成功态
-- 120ms克制动效
-- 终端美学：JetBrains Mono用于数据/标签，`> ` 前缀
-- 安全区适配：`safe-area-inset-*`
+前端使用 `fetch + Response.body.getReader()` + `TextDecoder("utf-8", {stream:true})` 逐 token 渲染。
 
 ## API 端点
 
 | 端点 | 方法 | 说明 |
 |:-----|:-----|:------|
-| `/api/health` | GET | 健康检查（版本/提供商数/模型数/请求统计） |
-| `/api/providers` | GET/POST | 列表/添加（隐藏api_key） |
-| `/api/providers/{id}` | DELETE | 删除 |
-| `/api/providers/{id}/test` | POST | 测试连接 + 获取模型列表 + 缓存 |
-| `/api/providers/{id}/models` | GET | 缓存模型列表 |
-| `/api/providers/{id}/balance` | POST | 余额查询（3级回退） |
-| `/api/chat` | POST | AI写作对话（provider+model+message+history） |
-| `/api/tokens` | GET | Token统计 |
-| `/api/tokens/reset` | POST | 重置统计 |
+| `/api/health` | GET | 健康检查 |
+| `/api/models` | GET/POST/DELETE | 模型配置CRUD(名称/地址/Key/ID/额度) |
+| `/api/chat` | POST | 一次性聊天 |
+| `/api/chat/stream` | POST | SSE流式聊天(实时token) |
+| `/api/writing/books` | GET/POST | 书籍列表/创建 |
+| `/api/writing/books/{id}` | GET/DELETE | 获取/删除 |
+| `/api/writing/books/{id}/chapters` | GET/POST | 章节列表/创建 |
+| `/api/writing/books/{id}/chapters/{cid}` | GET/DELETE | 获取/删除章节 |
+| `/api/writing/books/{id}/characters` | POST | 保存角色 |
+| `/api/writing/books/{id}/outline` | POST | 保存大纲 |
 
 ## 文件结构
 
 ```
 novel-writing-workbench/
-  server.py          ~370行 — FastAPI所有端点（含Chat）
+  server.py          ~395行 — FastAPI(SSE流式+写作API+模型CRUD)
   static/
-    index.html       ~22KB — 完整SPA(CSS+JS内联，4Tab+桌面三栏)
+    index.html       ~67KB — 完整SPA(InkOS UI, 1656行CSS+HTML+JS内联)
     sw.js            PWA Service Worker
     manifest.json    PWA配置
-    assets/          PWA icons (192+512)
-  data/              提供商/Token数据(providers.json+tokens.json)
-  references/        设计模式参考
+  data/              运行时数据(models.json + writing/{book_id}/ 书籍/章节/角色/大纲)
+  SKILL.md           本技能定义
 ```
 
 ## 陷阱
 
-- **端口占用**：重启前 `fuser -k 8080/tcp`
-- **api_key安全**：`GET /api/providers` 不返回 key，仅返回 `has_key: true/false`
-- **HTML热更新**：修改 index.html 无需重启服务器
-- **余额查询不支持所有提供商**：三级回退全部失败返回 `source: "none"`
-- **版本号散落6处**：更新版本时需修改 index.html(title/hero/sidebar/about) + server.py(docstring/print) —— 漏一处就有残留旧版本号
-- **Git无历史**：此仓库经历多次`git init`重置，推送时可能需要`--force`
-- **GitHub直连被墙**：推送用GitHub API + token，不走git协议
+- **SSE需要ReadableStream**: 前端用 `resp.body.getReader()` 流式读取，不支持老旧浏览器
+- **版本号散落**: index.html(title/sidebar/about) + server.py(docstring/print) 需同步更新
+- **模型Key安全**: GET /api/models 不返回 api_key，仅返回 has_key: true/false
+- **端口占用**: 重启前 pkill -f "python3 server.py"
+- **数据目录**: data/ 已加入 .gitignore，不提交运行时数据
